@@ -1,0 +1,19 @@
+# --- Dependencies ---
+node_modules/
+dist/
+build/
+venv/
+__pycache__/
+*.py[cod]
+.env
+
+# --- OS & IDE ---
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# --- Testing & Logs ---
+coverage/
+*.log
+.pytest_cache/
