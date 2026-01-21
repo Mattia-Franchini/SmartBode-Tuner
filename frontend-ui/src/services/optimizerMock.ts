@@ -7,7 +7,7 @@
  * of the Backend implementation. It returns synthetic data compliant 
  * with the `OptimizationResponse` interface.
  * 
- * @author [Your Name]
+ * @author [Mattia Franchini & Michele Bisignano]
  * @version 1.0.0
  */
 
