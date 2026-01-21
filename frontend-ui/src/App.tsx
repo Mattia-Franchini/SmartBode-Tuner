@@ -1,28 +1,58 @@
 /**
  * @file App.tsx
- * @description Main Entry Point for SmartBode Tuner Frontend.
+ * @description Root component with Theme Management and Main Layout.
  * 
  * @authors Mattia Franchini & Michele Bisignano
- * @version 1.1.0
+ * @version 1.2.0
  */
 
-import React, { useState } from 'react';
-import { CssBaseline, Container, Typography, Box, Grid, Alert } from '@mui/material';
+import React, { useState, useMemo } from 'react';
+import { CssBaseline, Container, Box, Grid, Alert, Typography } from '@mui/material';
+import { createTheme, ThemeProvider } from '@mui/material/styles';
+
+// Component Imports
+import Navbar from './components/Navbar';
 import BodePlot from './components/BodePlot';
 import SystemInputForm from './components/SystemInputForm';
 import CompensatorDetails from './components/CompensatorDetails';
+
+// Logic & Types
 import { mockOptimization } from './services/optimizerMock';
 import type { OptimizationResponse, SystemInput } from './types/ControlSystems';
 
 function App() {
+  // 1. STATE FOR THEME MODE
+  const [mode, setMode] = useState<'light' | 'dark'>('light');
+
+  // 2. STATE FOR DATA
   const [data, setData] = useState<OptimizationResponse | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
 
-  /**
-   * Optimization Handler
-   * Triggers the mock service and updates the global state.
-   */
+  // 3. CREATE DYNAMIC THEME
+  const theme = useMemo(() => createTheme({
+    palette: {
+      mode,
+      primary: {
+        main: '#1976d2', // Blue Ingegneria
+      },
+      background: {
+        default: mode === 'light' ? '#f4f6f8' : '#0a1929',
+        paper: mode === 'light' ? '#ffffff' : '#102031',
+      },
+    },
+    typography: {
+      fontFamily: '"Inter", "Roboto", "Helvetica", "Arial", sans-serif',
+    },
+    shape: {
+      borderRadius: 8,
+    },
+  }), [mode]);
+
+  const toggleTheme = () => {
+    setMode((prevMode) => (prevMode === 'light' ? 'dark' : 'light'));
+  };
+
   const handleOptimization = async (input: SystemInput) => {
     setLoading(true);
     setError(null);
@@ -31,37 +61,30 @@ function App() {
       setData(response);
     } catch (err) {
       setError("An error occurred during the optimization process.");
-      console.error(err);
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <>
-      <CssBaseline />
-      <Box sx={{ backgroundColor: '#f4f6f8', minHeight: '100vh', pb: 10 }}>
+    <ThemeProvider theme={theme}>
+      <CssBaseline /> {/* Manages global background colors based on theme */}
+      
+      <Box sx={{ minHeight: '100vh', pb: 10, bgcolor: 'background.default' }}>
         
-        {/* Navigation / Header */}
-        <Box sx={{ backgroundColor: '#fff', py: 3, borderBottom: '1px solid #e0e0e0', mb: 4 }}>
-          <Container maxWidth="xl">
-            <Typography variant="h4" fontWeight="800" color="primary">
-              SmartBode Tuner
-            </Typography>
-            <Typography variant="body2" color="text.secondary">
-              Developed by Mattia Franchini & Michele Bisignano
-            </Typography>
-          </Container>
-        </Box>
+        {/* NAVBAR */}
+        <Navbar mode={mode} onToggleTheme={toggleTheme} />
 
-        <Container maxWidth="xl">
-          {/* 
-              In MUI v6, 'container' is still used, 
-              but children use the 'size' prop instead of 'item' and 'xs/md'.
-          */}
+        <Container maxWidth="xl" sx={{ mt: 4 }}>
+          {/* Authors Attribution */}
+          <Box sx={{ mb: 4, textAlign: 'right' }}>
+             <Typography variant="caption" color="text.secondary">
+               System Architects: <strong>Mattia Franchini & Michele Bisignano</strong>
+             </Typography>
+          </Box>
+
           <Grid container spacing={4}>
-            
-            {/* Sidebar: Inputs and Numeric Results */}
+            {/* Sidebar */}
             <Grid size={{ xs: 12, md: 4 }}>
               <Grid container spacing={3}>
                 <Grid size={{ xs: 12 }}>
@@ -86,7 +109,7 @@ function App() {
               </Grid>
             </Grid>
 
-            {/* Main Area: Charts */}
+            {/* Charts Area */}
             <Grid size={{ xs: 12, md: 8 }}>
                 <BodePlot 
                     data={data ? data.bode.compensated : null} 
@@ -94,11 +117,10 @@ function App() {
                     title="Frequency Response (Bode Plot)" 
                 />
             </Grid>
-
           </Grid>
         </Container>
       </Box>
-    </>
+    </ThemeProvider>
   );
 }
 
