@@ -1,14 +1,16 @@
 /**
  * @file App.tsx
- * @description Root component with Theme Management and Main Layout.
+ * @description Optimized Dashboard Layout for SmartBode Tuner.
  * 
  * @authors Mattia Franchini & Michele Bisignano
- * @version 1.2.0
+ * @version 1.3.0
  */
 
 import React, { useState, useMemo } from 'react';
 import { CssBaseline, Container, Box, Grid, Alert, Typography } from '@mui/material';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
+import { Stack } from '@mui/material';
+import MethodologyCard from './components/MethodologyCard';
 
 // Component Imports
 import Navbar from './components/Navbar';
@@ -21,37 +23,24 @@ import { mockOptimization } from './services/optimizerMock';
 import type { OptimizationResponse, SystemInput } from './types/ControlSystems';
 
 function App() {
-  // 1. STATE FOR THEME MODE
   const [mode, setMode] = useState<'light' | 'dark'>('light');
-
-  // 2. STATE FOR DATA
   const [data, setData] = useState<OptimizationResponse | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
 
-  // 3. CREATE DYNAMIC THEME
   const theme = useMemo(() => createTheme({
     palette: {
       mode,
-      primary: {
-        main: '#1976d2', // Blue Ingegneria
-      },
+      primary: { main: '#1976d2' },
       background: {
-        default: mode === 'light' ? '#f4f6f8' : '#0a1929',
+        default: mode === 'light' ? '#f8f9fa' : '#0a1929',
         paper: mode === 'light' ? '#ffffff' : '#102031',
       },
     },
-    typography: {
-      fontFamily: '"Inter", "Roboto", "Helvetica", "Arial", sans-serif',
-    },
-    shape: {
-      borderRadius: 8,
-    },
+    shape: { borderRadius: 12 },
   }), [mode]);
 
-  const toggleTheme = () => {
-    setMode((prevMode) => (prevMode === 'light' ? 'dark' : 'light'));
-  };
+  const toggleTheme = () => setMode((prev) => (prev === 'light' ? 'dark' : 'light'));
 
   const handleOptimization = async (input: SystemInput) => {
     setLoading(true);
@@ -60,7 +49,7 @@ function App() {
       const response = await mockOptimization(input);
       setData(response);
     } catch (err) {
-      setError("An error occurred during the optimization process.");
+      setError("Error during optimization process.");
     } finally {
       setLoading(false);
     }
@@ -68,55 +57,63 @@ function App() {
 
   return (
     <ThemeProvider theme={theme}>
-      <CssBaseline /> {/* Manages global background colors based on theme */}
-      
-      <Box sx={{ minHeight: '100vh', pb: 10, bgcolor: 'background.default' }}>
-        
-        {/* NAVBAR */}
+      <CssBaseline />
+
+      <Box sx={{ minHeight: '100vh', pb: 6, bgcolor: 'background.default' }}>
         <Navbar mode={mode} onToggleTheme={toggleTheme} />
 
         <Container maxWidth="xl" sx={{ mt: 4 }}>
-          {/* Authors Attribution */}
-          <Box sx={{ mb: 4, textAlign: 'right' }}>
-             <Typography variant="caption" color="text.secondary">
-               System Architects: <strong>Mattia Franchini & Michele Bisignano</strong>
-             </Typography>
+          {/* Authors Tag */}
+          <Box sx={{ mb: 2, textAlign: 'right' }}>
+            <Typography variant="caption" color="text.secondary">
+              System Architects: <strong>Mattia Franchini & Michele Bisignano</strong>
+            </Typography>
           </Box>
 
-          <Grid container spacing={4}>
-            {/* Sidebar */}
+          <Grid container spacing={3}>
+
+            {/* 1. LEFT COLUMN: CONFIGURATION PANEL (MD=4) */}
             <Grid size={{ xs: 12, md: 4 }}>
+              <Stack spacing={3}>
+                <SystemInputForm onSubmit={handleOptimization} isLoading={loading} />
+
+                <MethodologyCard />
+
+                {error && (
+                  <Alert severity="error" sx={{ borderRadius: 3 }}>
+                    {error}
+                  </Alert>
+                )}
+              </Stack>
+            </Grid>
+
+            {/* 2. RIGHT COLUMN: RESULTS AREA (MD=8) */}
+            <Grid size={{ xs: 12, md: 8 }}>
               <Grid container spacing={3}>
+
+                {/* Top: Bode Plot Chart */}
                 <Grid size={{ xs: 12 }}>
-                  <SystemInputForm onSubmit={handleOptimization} isLoading={loading} />
+                  <BodePlot
+                    data={data ? data.bode.compensated : null}
+                    isLoading={loading}
+                    title="Frequency Response (Bode Plot)"
+                  />
                 </Grid>
-                
+
+                {/* Bottom: Optimal Solution Details (Only visible when data is present) */}
                 {data && !loading && (
                   <Grid size={{ xs: 12 }}>
-                    <CompensatorDetails 
-                        compensator={data.compensator} 
-                        pm={data.margins.pm} 
-                        gm={data.margins.gm} 
+                    <CompensatorDetails
+                      compensator={data.compensator}
+                      pm={data.margins.pm}
+                      gm={data.margins.gm}
                     />
                   </Grid>
                 )}
 
-                {error && (
-                  <Grid size={{ xs: 12 }}>
-                    <Alert severity="error">{error}</Alert>
-                  </Grid>
-                )}
               </Grid>
             </Grid>
 
-            {/* Charts Area */}
-            <Grid size={{ xs: 12, md: 8 }}>
-                <BodePlot 
-                    data={data ? data.bode.compensated : null} 
-                    isLoading={loading} 
-                    title="Frequency Response (Bode Plot)" 
-                />
-            </Grid>
           </Grid>
         </Container>
       </Box>
