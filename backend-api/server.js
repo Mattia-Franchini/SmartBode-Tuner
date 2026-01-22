@@ -12,6 +12,7 @@ const express = require('express');
 const cors = require('cors');
 const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
+const axios = require('axios');
 require('dotenv').config();
 
 const app = express();
@@ -48,23 +49,6 @@ app.get('/', (req, res) => {
 });
 
 /**
- * @route POST /api/optimize
- * @description Bridge route that will eventually call the Python AI Engine.
- * For now, it returns a confirmation message.
- */
-app.post('/api/optimize', (req, res) => {
-    const { numerator, denominator, targetPhaseMargin } = req.body;
-
-    console.log(`[Optimization Request] Received system with num: [${numerator}], den: [${denominator}]`);
-
-    res.status(200).json({
-        success: true,
-        message: "Data successfully received by the Node.js server.",
-        receivedData: { numerator, denominator, targetPhaseMargin }
-    });
-});
-
-/**
  * @route GET /api/projects/:userId
  * @description Fetch all projects belonging to a specific user.
  */
@@ -79,61 +63,72 @@ app.get('/api/projects/user/:userId', async (req, res) => {
 
 /**
  * @route POST /api/projects
- * @description Save project with owner ID.
+ * @description Optimization Bridge:
+ * 1. Receives input from Frontend.
+ * 2. Forwards data to Python AI Engine for computation.
+ * 3. Saves the result to MongoDB.
+ * 4. Returns the optimized solution to the Frontend.
  */
 app.post('/api/projects', async (req, res) => {
     try {
         const { projectName, inputData, userId } = req.body;
 
-        // 1. Simulazione Risultati AI (Mock)
-        const K = parseFloat((Math.random() * 10 + 1).toFixed(4));
-        const T = 0.25;
-        const alpha = 0.1;
-        const pm = 52.5;
-        const gm = 12.0;
+        console.log("[Node.js] 🔄 Calling Python AI Engine...");
 
-        // 2. Oggetto da salvare nel DB (Coerente con lo Schema Project.js)
+        // 1. BRIDGE CALL TO PYTHON AI ENGINE (Microservice)
+        // Forward the input data to the FastAPI service running on port 8000.
+        const pythonResponse = await axios.post('http://127.0.0.1:8000/optimize', {
+            numerator: inputData.numerator,
+            denominator: inputData.denominator,
+            targetPhaseMargin: inputData.targetPhaseMargin
+        });
+
+        // Extract the actual calculated results from the Python response
+        const aiResults = pythonResponse.data;
+
+        // 2. DATA PERSISTENCE (MongoDB)
+        // Create a new project record linking the User, Input, and AI Results
         const newProject = new Project({
-            userId: userId, // Importante: link all'utente
+            userId: userId,
             projectName: projectName || `Design ${new Date().toLocaleTimeString()}`,
             inputData: inputData,
             results: {
-                K, T, alpha, type: 'LEAD', // Parametri
-                pm, gm                     // Margini
+                K: aiResults.compensator.K,
+                T: aiResults.compensator.T,
+                alpha: aiResults.compensator.alpha,
+                type: aiResults.compensator.type,
+                pm: aiResults.margins.pm,
+                gm: aiResults.margins.gm
             }
         });
 
         const savedProject = await newProject.save();
-        console.log(`[Database] Saved project: ${savedProject._id}`);
+        console.log(`[Database] ✅ Project saved successfully: ${savedProject._id}`);
 
-        // 3. RISPOSTA AL FRONTEND (CRUCIALE: Deve avere questa struttura esatta)
+        // 3. RESPONSE TO FRONTEND
+        // Send back the combined data (AI results + Database Metadata)
         res.status(201).json({
             success: true,
-
-            // Per il componente CompensatorDetails
-            compensator: { K, T, alpha, type: 'LEAD' },
-            margins: { pm, gm },
-
-            // Per il componente BodePlot (Dati finti per ora)
-            bode: {
-                original: {
-                    frequency: [0.1, 1, 10, 100],
-                    magnitude: [20, 10, -10, -30],
-                    phase: [-5, -45, -90, -170]
-                },
-                compensated: {
-                    frequency: [0.1, 1, 10, 100],
-                    magnitude: [25, 15, -5, -25],
-                    phase: [-2, -20, -60, -140]
-                }
-            },
-
+            ...aiResults, // Spreads: compensator, margins, bode, etc.
             meta: { timestamp: savedProject.createdAt }
         });
 
     } catch (error) {
-        console.error("❌ BACKEND ERROR:", error);
-        res.status(500).json({ success: false, message: "Server error", error: error.message });
+        console.error("❌ BRIDGE ERROR:", error.message);
+
+        // Specific handling if the Python Microservice is offline
+        if (error.code === 'ECONNREFUSED') {
+            return res.status(503).json({ 
+                success: false, 
+                message: "AI Engine (Python) is offline. Please start the FastAPI server." 
+            });
+        }
+
+        res.status(500).json({ 
+            success: false, 
+            message: "Optimization failed during processing.", 
+            error: error.message 
+        });
     }
 });
 
