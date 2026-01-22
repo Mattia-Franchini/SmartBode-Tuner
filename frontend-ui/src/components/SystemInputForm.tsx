@@ -7,7 +7,7 @@
  */
 
 import React, { useState } from 'react';
-import { Paper, TextField, Button, Typography, Box, Grid, Divider, Stack } from '@mui/material';
+import { Paper, TextField, Button, Typography, Box, Divider, Stack } from '@mui/material';
 import TuneIcon from '@mui/icons-material/Tune';
 import SettingsInputComponentIcon from '@mui/icons-material/SettingsInputComponent';
 import type { SystemInput } from '../types/ControlSystems';

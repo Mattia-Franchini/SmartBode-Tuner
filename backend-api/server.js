@@ -11,7 +11,7 @@
 const express = require('express');
 const cors = require('cors');
 const mongoose = require('mongoose');
-const bcrypt = require('bcryptjs'); 
+const bcrypt = require('bcryptjs');
 require('dotenv').config();
 
 const app = express();
@@ -29,8 +29,8 @@ mongoose.connect(MONGO_URI)
 
 
 // --- MIDDLEWARE ---
-app.use(cors()); 
-app.use(express.json()); 
+app.use(cors());
+app.use(express.json());
 
 // --- ROUTES ---
 
@@ -54,7 +54,7 @@ app.get('/', (req, res) => {
  */
 app.post('/api/optimize', (req, res) => {
     const { numerator, denominator, targetPhaseMargin } = req.body;
-    
+
     console.log(`[Optimization Request] Received system with num: [${numerator}], den: [${denominator}]`);
 
     res.status(200).json({
@@ -65,47 +65,56 @@ app.post('/api/optimize', (req, res) => {
 });
 
 /**
+ * @route GET /api/projects/:userId
+ * @description Fetch all projects belonging to a specific user.
+ */
+app.get('/api/projects/user/:userId', async (req, res) => {
+    try {
+        const projects = await Project.find({ userId: req.params.userId }).sort({ createdAt: -1 });
+        res.json(projects);
+    } catch (error) {
+        res.status(500).json({ message: "Error fetching history" });
+    }
+});
+
+/**
  * @route POST /api/projects
- * @description Receives system data, generates a result, and saves it.
- * Matches the OptimizationResponse frontend interface.
+ * @description Save project with owner ID.
  */
 app.post('/api/projects', async (req, res) => {
     try {
-        const { projectName, inputData } = req.body;
+        const { projectName, inputData, userId } = req.body;
 
-        // 1. Generate Mock Results
-        const mockResults = {
-            K: parseFloat((Math.random() * 10 + 1).toFixed(4)),
-            T: 0.25,
-            alpha: 0.1,
-            type: 'LEAD'
-        };
+        // 1. Simulazione Risultati AI (Mock)
+        const K = parseFloat((Math.random() * 10 + 1).toFixed(4));
+        const T = 0.25;
+        const alpha = 0.1;
+        const pm = 52.5;
+        const gm = 12.0;
 
-        const margins = {
-            pm: 52.5,
-            gm: 12.0
-        };
-
-        // 2. Save to MongoDB
-        // Ensure your model (Project.js) matches this structure
+        // 2. Oggetto da salvare nel DB (Coerente con lo Schema Project.js)
         const newProject = new Project({
-            projectName: projectName || "Automated Design",
+            userId: userId, // Importante: link all'utente
+            projectName: projectName || `Design ${new Date().toLocaleTimeString()}`,
             inputData: inputData,
             results: {
-                ...mockResults,
-                pm: margins.pm,
-                gm: margins.gm
+                K, T, alpha, type: 'LEAD', // Parametri
+                pm, gm                     // Margini
             }
         });
 
         const savedProject = await newProject.save();
-        console.log(`[Database] Success: Saved project ${savedProject._id}`);
+        console.log(`[Database] Saved project: ${savedProject._id}`);
 
-        // 3. Send Response (MUST match OptimizationResponse interface)
+        // 3. RISPOSTA AL FRONTEND (CRUCIALE: Deve avere questa struttura esatta)
         res.status(201).json({
             success: true,
-            compensator: mockResults,
-            margins: margins, // Crucial for Frontend
+            
+            // Per il componente CompensatorDetails
+            compensator: { K, T, alpha, type: 'LEAD' }, 
+            margins: { pm, gm },
+            
+            // Per il componente BodePlot (Dati finti per ora)
             bode: {
                 original: {
                     frequency: [0.1, 1, 10, 100],
@@ -118,20 +127,13 @@ app.post('/api/projects', async (req, res) => {
                     phase: [-2, -20, -60, -140]
                 }
             },
-            meta: {
-                executionTime: 450,
-                timestamp: new Date().toISOString()
-            }
+            
+            meta: { timestamp: savedProject.createdAt }
         });
 
     } catch (error) {
-        // Log the SPECIFIC error to the terminal
-        console.error("❌ BACKEND ERROR:", error.message);
-        res.status(500).json({ 
-            success: false, 
-            message: "Internal Server Error", 
-            error: error.message 
-        });
+        console.error("❌ BACKEND ERROR:", error);
+        res.status(500).json({ success: false, message: "Server error", error: error.message });
     }
 });
 
@@ -159,7 +161,7 @@ app.post('/api/auth/register', async (req, res) => {
         res.status(201).json({ success: true });
     } catch (error) {
         // QUESTO LOG VI DICE ESATTAMENTE COSA NON VA
-        console.error("❌ ERRORE CRITICO REGISTRAZIONE:", error); 
+        console.error("❌ ERRORE CRITICO REGISTRAZIONE:", error);
         res.status(500).json({ message: "Registration error", details: error.message });
     }
 });

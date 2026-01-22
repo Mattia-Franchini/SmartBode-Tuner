@@ -6,7 +6,7 @@
  * @version 1.2.0
  */
 
-import React, { useState } from 'react';
+import React from 'react';
 import { AppBar, Toolbar, Typography, Button, IconButton, Box, Stack, Container } from '@mui/material';
 import DarkModeIcon from '@mui/icons-material/DarkMode';
 import LightModeIcon from '@mui/icons-material/LightMode';

@@ -3,12 +3,18 @@
  * @description Mongoose schema for storing Control System Design projects.
  * 
  * @authors Mattia Franchini & Michele Bisignano
- * @version 1.0.0
+ * @version 1.1.0
  */
 
 const mongoose = require('mongoose');
 
 const ProjectSchema = new mongoose.Schema({
+    // NEW: Reference to the User who created this project
+    userId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User',
+        required: true
+    },
     // Name chosen by the user for the project
     projectName: {
         type: String,
