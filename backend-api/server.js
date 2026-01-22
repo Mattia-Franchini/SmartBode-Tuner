@@ -14,6 +14,7 @@ const mongoose = require('mongoose');
 require('dotenv').config();
 
 const app = express();
+const Project = require('./models/Project');
 
 // --- DATABASE CONNECTION ---
 // Connects to the local MongoDB instance. 
@@ -59,6 +60,77 @@ app.post('/api/optimize', (req, res) => {
         message: "Data successfully received by the Node.js server.",
         receivedData: { numerator, denominator, targetPhaseMargin }
     });
+});
+
+/**
+ * @route POST /api/projects
+ * @description Receives system data, generates a result, and saves it.
+ * Matches the OptimizationResponse frontend interface.
+ */
+app.post('/api/projects', async (req, res) => {
+    try {
+        const { projectName, inputData } = req.body;
+
+        // 1. Generate Mock Results
+        const mockResults = {
+            K: parseFloat((Math.random() * 10 + 1).toFixed(4)),
+            T: 0.25,
+            alpha: 0.1,
+            type: 'LEAD'
+        };
+
+        const margins = {
+            pm: 52.5,
+            gm: 12.0
+        };
+
+        // 2. Save to MongoDB
+        // Ensure your model (Project.js) matches this structure
+        const newProject = new Project({
+            projectName: projectName || "Automated Design",
+            inputData: inputData,
+            results: {
+                ...mockResults,
+                pm: margins.pm,
+                gm: margins.gm
+            }
+        });
+
+        const savedProject = await newProject.save();
+        console.log(`[Database] Success: Saved project ${savedProject._id}`);
+
+        // 3. Send Response (MUST match OptimizationResponse interface)
+        res.status(201).json({
+            success: true,
+            compensator: mockResults,
+            margins: margins, // Crucial for Frontend
+            bode: {
+                original: {
+                    frequency: [0.1, 1, 10, 100],
+                    magnitude: [20, 10, -10, -30],
+                    phase: [-5, -45, -90, -170]
+                },
+                compensated: {
+                    frequency: [0.1, 1, 10, 100],
+                    magnitude: [25, 15, -5, -25],
+                    phase: [-2, -20, -60, -140]
+                }
+            },
+            meta: {
+                executionTime: 450,
+                timestamp: new Date().toISOString()
+            }
+        });
+
+    } catch (error) {
+        // Log the SPECIFIC error to the terminal
+        console.error("❌ BACKEND ERROR:", error.message);
+        res.status(500).json({ 
+            success: false, 
+            message: "Internal Server Error", 
+            error: error.message 
+        });
+    }
 });
 
 // --- SERVER START ---

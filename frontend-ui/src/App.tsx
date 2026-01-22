@@ -19,7 +19,8 @@ import SystemInputForm from './components/SystemInputForm';
 import CompensatorDetails from './components/CompensatorDetails';
 
 // Logic & Types
-import { mockOptimization } from './services/optimizerMock';
+//import { mockOptimization } from './services/optimizerMock';
+import { performOptimization } from './services/apiService';
 import type { OptimizationResponse, SystemInput } from './types/ControlSystems';
 
 function App() {
@@ -46,10 +47,10 @@ function App() {
     setLoading(true);
     setError(null);
     try {
-      const response = await mockOptimization(input);
+      const response = await performOptimization(input);
       setData(response);
     } catch (err) {
-      setError("Error during optimization process.");
+      setError("Cannot connect to the Backend Server. Make sure Node.js is running.");
     } finally {
       setLoading(false);
     }
@@ -106,8 +107,9 @@ function App() {
                   <Grid size={{ xs: 12 }}>
                     <CompensatorDetails
                       compensator={data.compensator}
-                      pm={data.margins.pm}
-                      gm={data.margins.gm}
+                      // Usiamo ?. per evitare il crash se margins è undefined
+                      pm={data.margins?.pm || 0}
+                      gm={data.margins?.gm || 0}
                     />
                   </Grid>
                 )}
