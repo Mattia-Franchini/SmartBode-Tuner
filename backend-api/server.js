@@ -10,9 +10,20 @@
 
 const express = require('express');
 const cors = require('cors');
+const mongoose = require('mongoose');
 require('dotenv').config();
 
 const app = express();
+
+// --- DATABASE CONNECTION ---
+// Connects to the local MongoDB instance. 
+// Database name: smartbode
+const MONGO_URI = process.env.MONGODB_URI || 'mongodb://127.0.0.1:27017/smartbode';
+
+mongoose.connect(MONGO_URI)
+    .then(() => console.log('✅ Connected to MongoDB (Local)'))
+    .catch(err => console.error('❌ MongoDB Connection Error:', err));
+
 
 // --- MIDDLEWARE ---
 app.use(cors()); 
