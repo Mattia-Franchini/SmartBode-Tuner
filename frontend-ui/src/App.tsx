@@ -4,7 +4,7 @@
  * Orchestrates Authentication, Theme Management, Data Flow, and UI Layout.
  * 
  * @authors Mattia Franchini & Michele Bisignano
- * @version 1.4.0
+ * @version 1.5.0
  */
 
 import { useState, useMemo } from 'react';
@@ -22,7 +22,7 @@ import MethodologyCard from './components/MethodologyCard';
 import HistorySidebar from './components/HistorySidebar';
 
 // --- Logic & Services ---
-import { performOptimization, getUserProjects } from './services/apiService';
+import { performOptimization, getUserProjects, deleteProject } from './services/apiService';
 import type { OptimizationResponse, SystemInput, User } from './types/ControlSystems';
 
 function App() {
@@ -55,7 +55,6 @@ function App() {
 
   /**
    * Fetches the design history for the specific user from the backend.
-   * @param userId The unique MongoDB ID of the logged-in user.
    */
   const loadHistory = async (userId: string) => {
     try {
@@ -67,7 +66,7 @@ function App() {
   };
 
   /**
-   * Main Handler: Sends input data to Node.js Backend -> Python Engine.
+   * Main Handler: Sends input data to Node.js Backend.
    */
   const handleOptimization = async (input: SystemInput) => {
     if (!currentUser) return;
@@ -77,13 +76,28 @@ function App() {
     try {
       const response = await performOptimization(input, currentUser.id);
       setData(response);
-
-      // Refresh history immediately to show the newly saved project
       loadHistory(currentUser.id);
     } catch (err) {
       setError("Cannot connect to the Backend Server. Ensure Node.js is running.");
     } finally {
       setLoading(false);
+    }
+  };
+
+  /**
+   * Handles project deletion via API and updates UI.
+   */
+  const handleDeleteProject = async (projectId: string) => {
+    if (!currentUser) return;
+
+    if (window.confirm("Are you sure you want to delete this design?")) {
+      try {
+        await deleteProject(projectId);
+        loadHistory(currentUser.id); // Refresh list
+        setData(null); // Clear current view if deleted
+      } catch (err) {
+        console.error("Failed to delete project", err);
+      }
     }
   };
 
@@ -93,7 +107,6 @@ function App() {
 
       <Box sx={{ minHeight: '100vh', pb: 6, bgcolor: 'background.default' }}>
 
-        {/* Navigation Bar */}
         <Navbar
           mode={mode}
           onToggleTheme={toggleTheme}
@@ -102,14 +115,13 @@ function App() {
           onLogout={() => {
             setIsLoggedIn(false);
             setCurrentUser(null);
-            setHistory([]); // Clear sensitive data on logout
+            setHistory([]); 
             setData(null);
           }}
           user={currentUser}
         />
 
         <Container maxWidth="xl" sx={{ mt: 4 }}>
-          {/* Authors Attribution */}
           <Box sx={{ mb: 2, textAlign: 'right' }}>
             <Typography variant="caption" color="text.secondary">
               System Architects: <strong>Mattia Franchini & Michele Bisignano</strong>
@@ -117,22 +129,25 @@ function App() {
           </Box>
 
           {isLoggedIn ? (
-            /* --- AUTHENTICATED DASHBOARD LAYOUT --- */
             <Grid container spacing={3}>
 
               {/* COLUMN 1: HISTORY SIDEBAR (Width: 2.5/12) */}
               <Grid size={{ xs: 12, md: 2.5 }}>
                 <HistorySidebar
                   projects={history}
+                  onDeleteProject={handleDeleteProject} // FIX: Posizionato correttamente qui!
                   onSelectProject={(proj) => {
-                    // Reconstruct the optimization response from the saved DB document
-                    // TODO: In a real scenario, full Bode points should be stored or re-calculated
+                    // Safe Data Reconstruction
                     setData({
                       success: true,
                       compensator: proj.results,
-                      margins: { pm: proj.results.pm, gm: proj.results.gm },
+                      // Use defaults (|| 0) to prevent crashes on old data
+                      margins: { 
+                        pm: proj.results.pm || 0, 
+                        gm: proj.results.gm || 0 
+                      },
+                      // Mock points for history viewing (prevents white chart)
                       bode: {
-                        // Placeholders if plot data isn't stored in DB
                         original: { frequency: [], magnitude: [], phase: [] },
                         compensated: { frequency: [], magnitude: [], phase: [] }
                       },
@@ -180,12 +195,10 @@ function App() {
 
             </Grid>
           ) : (
-            /* --- GUEST VIEW (LOCKED) --- */
             <LockedView onOpenAuth={() => setAuthOpen(true)} />
           )}
         </Container>
 
-        {/* Global Authentication Modal */}
         <AuthModal
           open={authOpen}
           onClose={() => setAuthOpen(false)}
@@ -193,8 +206,6 @@ function App() {
             setCurrentUser(userData);
             setIsLoggedIn(true);
             setAuthOpen(false);
-
-            // Trigger history loading immediately upon login
             if (userData.id) loadHistory(userData.id);
           }}
         />

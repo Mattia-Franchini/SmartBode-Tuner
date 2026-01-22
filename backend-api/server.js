@@ -109,11 +109,11 @@ app.post('/api/projects', async (req, res) => {
         // 3. RISPOSTA AL FRONTEND (CRUCIALE: Deve avere questa struttura esatta)
         res.status(201).json({
             success: true,
-            
+
             // Per il componente CompensatorDetails
-            compensator: { K, T, alpha, type: 'LEAD' }, 
+            compensator: { K, T, alpha, type: 'LEAD' },
             margins: { pm, gm },
-            
+
             // Per il componente BodePlot (Dati finti per ora)
             bode: {
                 original: {
@@ -127,13 +127,33 @@ app.post('/api/projects', async (req, res) => {
                     phase: [-2, -20, -60, -140]
                 }
             },
-            
+
             meta: { timestamp: savedProject.createdAt }
         });
 
     } catch (error) {
         console.error("❌ BACKEND ERROR:", error);
         res.status(500).json({ success: false, message: "Server error", error: error.message });
+    }
+});
+
+/**
+ * @route DELETE /api/projects/:id
+ * @description Delete a specific project by ID.
+ */
+app.delete('/api/projects/:id', async (req, res) => {
+    try {
+        const { id } = req.params;
+        const result = await Project.findByIdAndDelete(id);
+
+        if (!result) {
+            return res.status(404).json({ success: false, message: "Project not found" });
+        }
+
+        console.log(`[Database] Deleted project: ${id}`);
+        res.json({ success: true, message: "Project deleted" });
+    } catch (error) {
+        res.status(500).json({ message: "Error deleting project", error });
     }
 });
 

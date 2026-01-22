@@ -40,3 +40,11 @@ export const performOptimization = async (input: SystemInput, userId: string): P
 
     return response.data;
 };
+
+/**
+ * Deletes a project from the database.
+ */
+export const deleteProject = async (projectId: string) => {
+    const response = await axios.delete(`${API_URL}/projects/${projectId}`);
+    return response.data;
+};
