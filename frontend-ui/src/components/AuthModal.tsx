@@ -22,9 +22,10 @@ import GitHubIcon from '@mui/icons-material/GitHub';
 interface AuthModalProps {
     open: boolean;
     onClose: () => void;
+    onLoginSuccess: () => void;
 }
 
-const AuthModal: React.FC<AuthModalProps> = ({ open, onClose }) => {
+const AuthModal: React.FC<AuthModalProps> = ({ open, onClose, onLoginSuccess }) => {
     const [tabIndex, setTabIndex] = useState(0); // 0 = Login, 1 = Register
 
     const handleTabChange = (_: React.SyntheticEvent, newValue: number) => {
@@ -111,6 +112,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ open, onClose }) => {
 
                     <Button 
                         variant="contained" 
+                        onClick={onLoginSuccess}
                         size="large" 
                         fullWidth 
                         sx={{ py: 1.5, fontWeight: 'bold', borderRadius: 2, mt: 1 }}

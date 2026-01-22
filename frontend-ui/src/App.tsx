@@ -17,6 +17,8 @@ import Navbar from './components/Navbar';
 import BodePlot from './components/BodePlot';
 import SystemInputForm from './components/SystemInputForm';
 import CompensatorDetails from './components/CompensatorDetails';
+import LockedView from './components/LockedView'; 
+import AuthModal from './components/AuthModal';
 
 // Logic & Types
 //import { mockOptimization } from './services/optimizerMock';
@@ -28,6 +30,8 @@ function App() {
   const [data, setData] = useState<OptimizationResponse | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
+  const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
+  const [authOpen, setAuthOpen] = useState<boolean>(false);
 
   const theme = useMemo(() => createTheme({
     palette: {
@@ -61,7 +65,13 @@ function App() {
       <CssBaseline />
 
       <Box sx={{ minHeight: '100vh', pb: 6, bgcolor: 'background.default' }}>
-        <Navbar mode={mode} onToggleTheme={toggleTheme} />
+      <Navbar 
+            mode={mode} 
+            onToggleTheme={toggleTheme} 
+            onOpenAuth={() => setAuthOpen(true)}
+            isLoggedIn={isLoggedIn}
+            onLogout={() => setIsLoggedIn(false)}
+        />
 
         <Container maxWidth="xl" sx={{ mt: 4 }}>
           {/* Authors Tag */}
@@ -71,6 +81,7 @@ function App() {
             </Typography>
           </Box>
 
+          {isLoggedIn ? (
           <Grid container spacing={3}>
 
             {/* 1. LEFT COLUMN: CONFIGURATION PANEL (MD=4) */}
@@ -107,7 +118,6 @@ function App() {
                   <Grid size={{ xs: 12 }}>
                     <CompensatorDetails
                       compensator={data.compensator}
-                      // Usiamo ?. per evitare il crash se margins è undefined
                       pm={data.margins?.pm || 0}
                       gm={data.margins?.gm || 0}
                     />
@@ -118,7 +128,20 @@ function App() {
             </Grid>
 
           </Grid>
+          ) : (
+            <LockedView onOpenAuth={() => setAuthOpen(true)} />
+          )}
         </Container>
+
+        <AuthModal 
+          open={authOpen} 
+          onClose={() => setAuthOpen(false)} 
+          onLoginSuccess={() => {
+            setIsLoggedIn(true);
+            setAuthOpen(false);
+          }} 
+        />
+
       </Box>
     </ThemeProvider>
   );
