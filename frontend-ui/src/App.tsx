@@ -95,8 +95,9 @@ function App() {
                 <Grid size={{ xs: 12 }}>
                   <BodePlot
                     data={data ? data.bode.compensated : null}
+                    originalData={data ? data.bode.original : null}
                     isLoading={loading}
-                    title="Frequency Response (Bode Plot)"
+                    title="Frequency Response Analysis"
                   />
                 </Grid>
 
