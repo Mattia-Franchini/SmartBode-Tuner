@@ -11,10 +11,12 @@
 const express = require('express');
 const cors = require('cors');
 const mongoose = require('mongoose');
+const bcrypt = require('bcryptjs'); 
 require('dotenv').config();
 
 const app = express();
 const Project = require('./models/Project');
+const User = require('./models/User');
 
 // --- DATABASE CONNECTION ---
 // Connects to the local MongoDB instance. 
@@ -142,31 +144,31 @@ app.post('/api/projects', async (req, res) => {
 app.post('/api/auth/register', async (req, res) => {
     try {
         const { fullName, email, password } = req.body;
+        console.log("Tentativo di registrazione per:", email); // LOG DI DEBUG
 
-        // Check if user already exists
         const existingUser = await User.findOne({ email });
         if (existingUser) return res.status(400).json({ message: "Email already registered" });
 
-        // Hash the password (Security First!)
         const salt = await bcrypt.genSalt(10);
         const hashedPassword = await bcrypt.hash(password, salt);
 
-        const newUser = new User({
-            fullName,
-            email,
-            password: hashedPassword
-        });
-
+        const newUser = new User({ fullName, email, password: hashedPassword });
         await newUser.save();
-        res.status(201).json({ success: true, message: "User created successfully" });
+
+        console.log("✅ Utente salvato con successo!");
+        res.status(201).json({ success: true });
     } catch (error) {
-        res.status(500).json({ message: "Registration error", error: error.message });
+        // QUESTO LOG VI DICE ESATTAMENTE COSA NON VA
+        console.error("❌ ERRORE CRITICO REGISTRAZIONE:", error); 
+        res.status(500).json({ message: "Registration error", details: error.message });
     }
 });
 
 /**
  * @route POST /api/auth/login
  * @description Verify credentials and allow access.
+ * 
+ * @authors Mattia Franchini & Michele Bisignano
  */
 app.post('/api/auth/login', async (req, res) => {
     try {
@@ -180,12 +182,19 @@ app.post('/api/auth/login', async (req, res) => {
         const isMatch = await bcrypt.compare(password, user.password);
         if (!isMatch) return res.status(401).json({ message: "Invalid credentials" });
 
+        // --- ADDED LOG MESSAGE ---
+        // Stampa nel terminale del server chi ha effettuato l'accesso
+        console.log(`[Auth] ✅ User successfully logged in: ${user.fullName} (${user.email})`);
+        // -------------------------
+
         // Login success
         res.status(200).json({
             success: true,
             user: { id: user._id, fullName: user.fullName, email: user.email }
         });
     } catch (error) {
+        // Log error for debugging
+        console.error(`[Auth] ❌ Login error for ${req.body.email}:`, error.message);
         res.status(500).json({ message: "Login error", error: error.message });
     }
 });

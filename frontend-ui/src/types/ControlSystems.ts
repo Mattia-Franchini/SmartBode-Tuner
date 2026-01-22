@@ -17,13 +17,13 @@
  */
 export interface SystemInput {
     /** Coefficients of the numerator polynomial (descending power of s). */
-    numerator: number[];   
-    
+    numerator: number[];
+
     /** Coefficients of the denominator polynomial (descending power of s). */
-    denominator: number[]; 
-    
+    denominator: number[];
+
     /** The desired Phase Margin in degrees (e.g., 50.0). */
-    targetPhaseMargin: number; 
+    targetPhaseMargin: number;
 }
 
 /**
@@ -32,16 +32,16 @@ export interface SystemInput {
  */
 export interface Compensator {
     /** Static Gain (K). */
-    K: number;      
-    
+    K: number;
+
     /** Time Constant (T) in seconds. */
-    T: number;      
-    
+    T: number;
+
     /** Attenuation/Amplification factor (alpha). */
-    alpha: number;  
-    
+    alpha: number;
+
     /** Classification of the network topology. */
-    type: 'LEAD' | 'LAG'; 
+    type: 'LEAD' | 'LAG';
 }
 
 /**
@@ -50,13 +50,13 @@ export interface Compensator {
  */
 export interface BodePlotData {
     /** Frequency vector [rad/s] (Logarithmic X-Axis). */
-    frequency: number[]; 
-    
+    frequency: number[];
+
     /** Magnitude vector [dB] (Y1-Axis). */
-    magnitude: number[]; 
-    
+    magnitude: number[];
+
     /** Phase vector [degrees] (Y2-Axis). */
-    phase: number[];     
+    phase: number[];
 }
 
 /**
@@ -66,34 +66,52 @@ export interface BodePlotData {
 export interface OptimizationResponse {
     /** Indicates if the optimization algorithm converged to a stable solution. */
     success: boolean;
-    
+
     /** The optimal compensator parameters found by the AI. */
     compensator: Compensator;
-    
+
     /** Frequency response data for visualization. */
     bode: {
         /** Data for the uncompensated system G(s) (for comparison). */
-        original: BodePlotData;    
-        
+        original: BodePlotData;
+
         /** Data for the compensated system L(s) = C(s)G(s). */
-        compensated: BodePlotData; 
+        compensated: BodePlotData;
     };
-    
+
     /** Achieved stability margins. */
     margins: {
         /** The actual Phase Margin achieved [deg]. */
-        pm: number; 
-        
+        pm: number;
+
         /** The actual Gain Margin achieved [dB]. */
-        gm: number; 
+        gm: number;
     };
-    
+
     /** Metadata about the request execution. */
     meta: {
         /** Computational time in milliseconds. */
-        executionTime: number; 
-        
+        executionTime: number;
+
         /** ISO timestamp of the result. */
         timestamp: string;
     };
+}
+
+/**
+ * Represents a registered user in the system.
+ */
+export interface User {
+    id: string;
+    fullName: string;
+    email: string;
+}
+
+/**
+ * Response from the Authentication API.
+ */
+export interface AuthResponse {
+    success: boolean;
+    message?: string;
+    user?: User;
 }

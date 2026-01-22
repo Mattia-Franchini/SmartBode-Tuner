@@ -12,6 +12,7 @@ import DarkModeIcon from '@mui/icons-material/DarkMode';
 import LightModeIcon from '@mui/icons-material/LightMode';
 import TuneIcon from '@mui/icons-material/Tune';
 import LogoutIcon from '@mui/icons-material/Logout';
+import type { User } from '../types/ControlSystems';
 
 
 interface NavbarProps {
@@ -19,12 +20,24 @@ interface NavbarProps {
     mode: 'light' | 'dark';
     /** Function to toggle between light and dark mode */
     onToggleTheme: () => void;
-    onOpenAuth: () => void;   
-    isLoggedIn: boolean;      
-    onLogout: () => void; 
+    onOpenAuth: () => void;
+    isLoggedIn: boolean;
+    onLogout: () => void;
+    user: User | null;
 }
 
-const Navbar: React.FC<NavbarProps> = ({ mode, onToggleTheme, onOpenAuth, isLoggedIn, onLogout }) => {
+const Navbar: React.FC<NavbarProps> = ({ mode, onToggleTheme, onOpenAuth, isLoggedIn, onLogout, user }) => {
+
+    /**
+    * Determines the appropriate greeting based on the current time of day.
+    */
+    const getGreeting = () => {
+        const hour = new Date().getHours();
+        if (hour >= 5 && hour < 12) return "Buongiorno";
+        if (hour >= 12 && hour < 18) return "Buon pomeriggio";
+        return "Buonasera";
+    };
+
     return (
         <>
             <AppBar position="sticky" elevation={0} sx={{ borderBottom: '1px solid', borderColor: 'divider', bgcolor: 'background.paper', color: 'text.primary' }}>
@@ -41,6 +54,15 @@ const Navbar: React.FC<NavbarProps> = ({ mode, onToggleTheme, onOpenAuth, isLogg
                             SmartBode Tuner
                         </Typography>
 
+                        {/* CENTER SECTION: WELCOME MESSAGE (Only if logged in) */}
+                        {isLoggedIn && user && (
+                            <Box sx={{ display: { xs: 'none', sm: 'flex' }, alignItems: 'center', mr: 3 }}>
+                                <Typography variant="body2" sx={{ fontWeight: 500, color: 'text.secondary' }}>
+                                    {getGreeting()}, <Box component="span" sx={{ color: 'primary.main', fontWeight: 700 }}>{user.fullName}</Box>
+                                </Typography>
+                            </Box>
+                        )}
+
                         {/* RIGHT SIDE: AUTH & THEME */}
                         <Stack direction="row" spacing={2} alignItems="center">
 
@@ -50,21 +72,21 @@ const Navbar: React.FC<NavbarProps> = ({ mode, onToggleTheme, onOpenAuth, isLogg
                             </IconButton>
 
                             {isLoggedIn ? (
-                            <Button 
-                                color="error" 
-                                variant="outlined" 
-                                size="small" 
-                                startIcon={<LogoutIcon />} 
-                                onClick={onLogout}
-                            >
-                                Logout
-                            </Button>
-                        ) : (
-                            <Box sx={{ display: { xs: 'none', sm: 'block' } }}>
-                                <Button color="inherit" onClick={onOpenAuth}>Login</Button>
-                                <Button variant="contained" sx={{ ml: 1 }} onClick={onOpenAuth}>Register</Button>
-                            </Box>
-                        )}
+                                <Button
+                                    color="error"
+                                    variant="outlined"
+                                    size="small"
+                                    startIcon={<LogoutIcon />}
+                                    onClick={onLogout}
+                                >
+                                    Logout
+                                </Button>
+                            ) : (
+                                <Box sx={{ display: { xs: 'none', sm: 'block' } }}>
+                                    <Button color="inherit" onClick={onOpenAuth}>Login</Button>
+                                    <Button variant="contained" sx={{ ml: 1 }} onClick={onOpenAuth}>Register</Button>
+                                </Box>
+                            )}
                         </Stack>
                     </Toolbar>
                 </Container>

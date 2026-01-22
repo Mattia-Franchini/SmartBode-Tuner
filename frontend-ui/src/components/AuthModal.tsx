@@ -1,139 +1,123 @@
 /**
  * @file AuthModal.tsx
- * @description Modern Login/Register modal with glassmorphism effects.
+ * @description Logic-enabled Auth Modal connected to Node.js Backend.
  * 
  * @authors Mattia Franchini & Michele Bisignano
- * @version 1.0.0
+ * @version 1.1.0
  */
 
 import React, { useState } from 'react';
 import { 
     Dialog, DialogContent, TextField, Button, Typography, 
-    Box, Stack, IconButton, InputAdornment, Tab, Tabs, 
-    Divider, Link 
+    Box, Stack, IconButton, Tabs, Tab, Alert 
 } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
-import EmailIcon from '@mui/icons-material/Email';
-import LockIcon from '@mui/icons-material/Lock';
-import PersonIcon from '@mui/icons-material/Person';
-import GoogleIcon from '@mui/icons-material/Google';
-import GitHubIcon from '@mui/icons-material/GitHub';
+import { loginUser, registerUser } from '../services/authService';
+import type { User } from '../types/ControlSystems'; // Ensure this type is defined in your types file
 
 interface AuthModalProps {
     open: boolean;
     onClose: () => void;
-    onLoginSuccess: () => void;
+    /** Callback triggered upon successful authentication, passing the user object */
+    onLoginSuccess: (user: User) => void; 
 }
 
 const AuthModal: React.FC<AuthModalProps> = ({ open, onClose, onLoginSuccess }) => {
-    const [tabIndex, setTabIndex] = useState(0); // 0 = Login, 1 = Register
+    const [tabIndex, setTabIndex] = useState(0); 
+    
+    // Form State
+    const [fullName, setFullName] = useState('');
+    const [email, setEmail] = useState('');
+    const [password, setPassword] = useState('');
+    
+    // UI State
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState<string | null>(null);
 
-    const handleTabChange = (_: React.SyntheticEvent, newValue: number) => {
-        setTabIndex(newValue);
+    /**
+     * Handles the form submission for both Login and Registration.
+     */
+    const handleSubmit = async () => {
+        setLoading(true);
+        setError(null);
+        try {
+            if (tabIndex === 0) {
+                // LOGIN FLOW
+                const res = await loginUser(email, password);
+                if (res.success && res.user) {
+                    onLoginSuccess(res.user); // Pass the real user data to App.tsx
+                }
+            } else {
+                // REGISTRATION FLOW
+                const res = await registerUser(fullName, email, password);
+                if (res.success) {
+                    alert("Registration successful! Please sign in with your new credentials.");
+                    setTabIndex(0); // Switch to Login tab
+                }
+            }
+        } catch (err: any) {
+            // Display error message from backend or a default fallback
+            setError(err.response?.data?.message || "Authentication failed. Please check your credentials.");
+        } finally {
+            setLoading(false);
+        }
     };
 
     return (
         <Dialog 
             open={open} 
-            onClose={onClose}
-            maxWidth="xs"
-            fullWidth
-            PaperProps={{
-                sx: {
-                    borderRadius: 4,
-                    padding: 1,
-                    backgroundImage: 'none', // Reset for dark mode
-                    boxShadow: '0 8px 32px 0 rgba(0, 0, 0, 0.2)',
-                }
-            }}
+            onClose={onClose} 
+            maxWidth="xs" 
+            fullWidth 
+            PaperProps={{ sx: { borderRadius: 4 } }}
         >
-            {/* Header with Close Button */}
             <Box sx={{ display: 'flex', justifyContent: 'flex-end', p: 1 }}>
-                <IconButton onClick={onClose} size="small">
-                    <CloseIcon />
-                </IconButton>
+                <IconButton onClick={onClose} size="small"><CloseIcon /></IconButton>
             </Box>
-
+            
             <DialogContent sx={{ pt: 0 }}>
                 <Typography variant="h5" fontWeight="800" align="center" gutterBottom>
                     {tabIndex === 0 ? "Welcome Back" : "Create Account"}
                 </Typography>
-                <Typography variant="body2" color="text.secondary" align="center" sx={{ mb: 3 }}>
-                    {tabIndex === 0 ? "Access your control projects" : "Join the engineering community"}
-                </Typography>
 
-                {/* Tabs Selector */}
-                <Tabs 
-                    value={tabIndex} 
-                    onChange={handleTabChange} 
-                    centered 
-                    sx={{ mb: 3, borderBottom: 1, borderColor: 'divider' }}
-                >
+                <Tabs value={tabIndex} onChange={(_, v) => setTabIndex(v)} centered sx={{ mb: 3 }}>
                     <Tab label="Login" />
                     <Tab label="Register" />
                 </Tabs>
 
-                {/* FORM AREA */}
+                {error && <Alert severity="error" sx={{ mb: 2, borderRadius: 2 }}>{error}</Alert>}
+
                 <Stack spacing={2}>
                     {tabIndex === 1 && (
-                        <TextField
-                            fullWidth
-                            label="Full Name"
-                            placeholder="Mattia Franchini"
-                            InputProps={{
-                                startAdornment: <InputAdornment position="start"><PersonIcon fontSize="small" /></InputAdornment>,
-                            }}
+                        <TextField 
+                            fullWidth label="Full Name" 
+                            value={fullName} 
+                            onChange={(e) => setFullName(e.target.value)} 
                         />
                     )}
-
-                    <TextField
-                        fullWidth
-                        label="Email Address"
-                        placeholder="michele@example.com"
-                        InputProps={{
-                            startAdornment: <InputAdornment position="start"><EmailIcon fontSize="small" /></InputAdornment>,
-                        }}
+                    <TextField 
+                        fullWidth label="Email Address" 
+                        value={email} 
+                        onChange={(e) => setEmail(e.target.value)} 
                     />
-
-                    <TextField
-                        fullWidth
-                        label="Password"
-                        type="password"
-                        InputProps={{
-                            startAdornment: <InputAdornment position="start"><LockIcon fontSize="small" /></InputAdornment>,
-                        }}
+                    <TextField 
+                        fullWidth label="Password" 
+                        type="password" 
+                        value={password} 
+                        onChange={(e) => setPassword(e.target.value)} 
                     />
-
-                    {tabIndex === 0 && (
-                        <Link href="#" variant="caption" sx={{ alignSelf: 'flex-end', textDecoration: 'none' }}>
-                            Forgot password?
-                        </Link>
-                    )}
 
                     <Button 
                         variant="contained" 
-                        onClick={onLoginSuccess}
-                        size="large" 
                         fullWidth 
-                        sx={{ py: 1.5, fontWeight: 'bold', borderRadius: 2, mt: 1 }}
+                        size="large" 
+                        onClick={handleSubmit}
+                        disabled={loading}
+                        sx={{ mt: 2, fontWeight: 'bold', height: 50, borderRadius: 2 }}
                     >
-                        {tabIndex === 0 ? "Sign In" : "Start Now"}
+                        {loading ? "Authenticating..." : (tabIndex === 0 ? "Sign In" : "Register")}
                     </Button>
                 </Stack>
-
-                {/* SOCIAL LOGIN */}
-                <Box sx={{ my: 3 }}>
-                    <Divider><Typography variant="caption" color="text.secondary">OR CONTINUE WITH</Typography></Divider>
-                </Box>
-
-                <Stack direction="row" spacing={2} sx={{ mb: 2 }}>
-                    <Button fullWidth variant="outlined" startIcon={<GoogleIcon />} sx={{ borderRadius: 2 }}>Google</Button>
-                    <Button fullWidth variant="outlined" startIcon={<GitHubIcon />} sx={{ borderRadius: 2 }}>GitHub</Button>
-                </Stack>
-
-                <Typography variant="caption" color="text.secondary" align="center" display="block" sx={{ mt: 2 }}>
-                    By continuing, you agree to our Terms of Service.
-                </Typography>
             </DialogContent>
         </Dialog>
     );
