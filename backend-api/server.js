@@ -5,7 +5,7 @@
  * and the Python AI Computational Engine.
  * 
  * @authors Mattia Franchini & Michele Bisignano
- * @version 1.0.0
+ * @version 1.1.0
  */
 
 const express = require('express');
@@ -130,6 +130,63 @@ app.post('/api/projects', async (req, res) => {
             message: "Internal Server Error", 
             error: error.message 
         });
+    }
+});
+
+// --- AUTHENTICATION ROUTES ---
+
+/**
+ * @route POST /api/auth/register
+ * @description Create a new user account with hashed password.
+ */
+app.post('/api/auth/register', async (req, res) => {
+    try {
+        const { fullName, email, password } = req.body;
+
+        // Check if user already exists
+        const existingUser = await User.findOne({ email });
+        if (existingUser) return res.status(400).json({ message: "Email already registered" });
+
+        // Hash the password (Security First!)
+        const salt = await bcrypt.genSalt(10);
+        const hashedPassword = await bcrypt.hash(password, salt);
+
+        const newUser = new User({
+            fullName,
+            email,
+            password: hashedPassword
+        });
+
+        await newUser.save();
+        res.status(201).json({ success: true, message: "User created successfully" });
+    } catch (error) {
+        res.status(500).json({ message: "Registration error", error: error.message });
+    }
+});
+
+/**
+ * @route POST /api/auth/login
+ * @description Verify credentials and allow access.
+ */
+app.post('/api/auth/login', async (req, res) => {
+    try {
+        const { email, password } = req.body;
+
+        // 1. Find user by email
+        const user = await User.findOne({ email });
+        if (!user) return res.status(404).json({ message: "User not found" });
+
+        // 2. Compare hashed password
+        const isMatch = await bcrypt.compare(password, user.password);
+        if (!isMatch) return res.status(401).json({ message: "Invalid credentials" });
+
+        // Login success
+        res.status(200).json({
+            success: true,
+            user: { id: user._id, fullName: user.fullName, email: user.email }
+        });
+    } catch (error) {
+        res.status(500).json({ message: "Login error", error: error.message });
     }
 });
 
