@@ -23,6 +23,7 @@ import PersonIcon from '@mui/icons-material/Person';
 import SettingsIcon from '@mui/icons-material/Settings'; 
 
 import type { User } from '../types/ControlSystems';
+import { getGreeting } from '../utils/timeUtils';
 
 interface NavbarProps {
     mode: 'light' | 'dark';
@@ -34,7 +35,7 @@ interface NavbarProps {
     onOpenProjects: () => void;
 }
 
-const Navbar: React.FC<NavbarProps> = ({ mode, onToggleTheme, onOpenAuth, isLoggedIn, onLogout, user, onOpenProjects }) => {
+const Navbar: React.FC<NavbarProps> = ({ mode, onToggleTheme, isLoggedIn, onLogout, user, onOpenProjects }) => {
     const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
     const openMenu = Boolean(anchorEl);
 
@@ -90,9 +91,9 @@ const Navbar: React.FC<NavbarProps> = ({ mode, onToggleTheme, onOpenAuth, isLogg
                                     <Avatar sx={{ width: 32, height: 32, bgcolor: 'primary.main', mr: 1, fontSize: '0.9rem' }}>
                                         {user.fullName.charAt(0)}
                                     </Avatar>
-                                    <Typography variant="body2" fontWeight="bold" sx={{ display: { xs: 'none', sm: 'block' } }}>
-                                        {user.fullName.split(' ')[0]}
-                                    </Typography>
+                                    <Typography variant="body2" sx={{ fontWeight: 500, color: 'text.secondary' }}>
+    {getGreeting(new Date().getHours())}, <Box component="span" sx={{ color: 'primary.main', fontWeight: 700 }}>{user.fullName}</Box>
+</Typography>
                                 </Button>
 
                                 {/* DROPDOWN MENU */}

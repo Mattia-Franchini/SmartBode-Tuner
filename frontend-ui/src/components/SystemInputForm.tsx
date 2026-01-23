@@ -3,7 +3,7 @@
  * @description Enhanced Input Interface with better vertical distribution.
  * 
  * @authors Mattia Franchini & Michele Bisignano
- * @version 1.2.0
+ * @version 1.2.1
  */
 
 import React, { useState } from 'react';
@@ -11,6 +11,7 @@ import { Paper, TextField, Button, Typography, Box, Divider, Stack } from '@mui/
 import TuneIcon from '@mui/icons-material/Tune';
 import SettingsInputComponentIcon from '@mui/icons-material/SettingsInputComponent';
 import type { SystemInput } from '../types/ControlSystems';
+import { parseCSVToNumbers } from '../utils/mathUtils';
 
 interface SystemInputFormProps {
     onSubmit: (data: SystemInput) => void;
@@ -22,15 +23,11 @@ const SystemInputForm: React.FC<SystemInputFormProps> = ({ onSubmit, isLoading }
     const [denStr, setDenStr] = useState<string>("1, 2, 10");
     const [pmStr, setPmStr] = useState<string>("50");
 
-    const parseCSV = (input: string): number[] => {
-        return input.split(',').map(val => parseFloat(val.trim())).filter(val => !isNaN(val));
-    };
-
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
         const payload: SystemInput = {
-            numerator: parseCSV(numStr),
-            denominator: parseCSV(denStr),
+            numerator: parseCSVToNumbers(numStr),
+            denominator: parseCSVToNumbers(denStr),
             targetPhaseMargin: parseFloat(pmStr) || 45
         };
         onSubmit(payload);
