@@ -3,7 +3,7 @@
  * @description Navigation bar with extended User Dropdown Menu (Profile, Settings, Projects).
  * 
  * @authors Mattia Franchini & Michele Bisignano
- * @version 1.5.0
+ * @version 1.5.1
  */
 
 import React, { useState } from 'react';
@@ -163,8 +163,6 @@ const Navbar: React.FC<NavbarProps> = ({ mode, onToggleTheme, onOpenAuth, isLogg
                             </>
                         ) : (
                             <Box sx={{ display: 'flex', gap: 1 }}>
-                                <Button color="inherit" onClick={onOpenAuth}>Login</Button>
-                                <Button variant="contained" onClick={onOpenAuth} sx={{ fontWeight: 'bold' }}>Register</Button>
                             </Box>
                         )}
                     </Stack>
