@@ -216,12 +216,20 @@ app.post('/api/auth/login', async (req, res) => {
     }
 });
 
-// --- SERVER START ---
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
-    console.log(`\n=================================================`);
-    console.log(`🚀 SMARTBODE BACKEND IS LIVE`);
-    console.log(`📡 URL: http://localhost:${PORT}`);
-    console.log(`👨‍💻 AUTHORS: Mattia Franchini & Michele Bisignano`);
-    console.log(`=================================================\n`);
-});
+
+if (process.env.NODE_ENV !== 'test') {
+    app.listen(PORT, () => {
+        console.log(`\n=================================================`);
+        console.log(`🚀 SMARTBODE BACKEND IS LIVE`);
+        console.log(`📡 URL: http://localhost:${PORT}`);
+        console.log(`👨‍💻 AUTHORS: Mattia Franchini & Michele Bisignano`);
+        console.log(`=================================================\n`);
+    });
+}
+
+/**
+ * @description Export the app instance.
+ * Required for the Jest/Supertest suite to perform API integration testing.
+ */
+module.exports = app;
