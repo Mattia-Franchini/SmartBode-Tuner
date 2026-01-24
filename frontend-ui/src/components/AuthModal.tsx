@@ -3,7 +3,7 @@
  * @description Logic-enabled Auth Modal connected to Node.js Backend.
  * 
  * @authors Mattia Franchini & Michele Bisignano
- * @version 1.1.0
+ * @version 1.2.0
  */
 
 import React, { useState } from 'react';
@@ -13,16 +13,18 @@ import {
 } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import { loginUser, registerUser } from '../services/authService';
-import type { User } from '../types/ControlSystems'; // Ensure this type is defined in your types file
+import type { User } from '../types/ControlSystems'; 
+import type { AlertColor } from '@mui/material';
 
 interface AuthModalProps {
     open: boolean;
     onClose: () => void;
     /** Callback triggered upon successful authentication, passing the user object */
     onLoginSuccess: (user: User) => void; 
+    onNotify: (message: string, severity: AlertColor) => void;
 }
 
-const AuthModal: React.FC<AuthModalProps> = ({ open, onClose, onLoginSuccess }) => {
+const AuthModal: React.FC<AuthModalProps> = ({ open, onClose, onLoginSuccess, onNotify }) => {
     const [tabIndex, setTabIndex] = useState(0); 
     
     // Form State
@@ -45,19 +47,20 @@ const AuthModal: React.FC<AuthModalProps> = ({ open, onClose, onLoginSuccess }) 
                 // LOGIN FLOW
                 const res = await loginUser(email, password);
                 if (res.success && res.user) {
-                    onLoginSuccess(res.user); // Pass the real user data to App.tsx
+                    onLoginSuccess(res.user); 
                 }
             } else {
                 // REGISTRATION FLOW
                 const res = await registerUser(fullName, email, password);
                 if (res.success) {
-                    alert("Registration successful! Please sign in with your new credentials.");
+                    onNotify("Registration successful! Please sign in with your new account.", "success");
                     setTabIndex(0); // Switch to Login tab
                 }
             }
         } catch (err: any) {
-            // Display error message from backend or a default fallback
-            setError(err.response?.data?.message || "Authentication failed. Please check your credentials.");
+            const msg = err.response?.data?.message || "Authentication failed";
+            setError(msg);
+            onNotify(msg, "error");
         } finally {
             setLoading(false);
         }

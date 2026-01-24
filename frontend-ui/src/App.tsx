@@ -8,6 +8,7 @@
 import { useState, useMemo } from 'react';
 import { CssBaseline, Container, Box, Grid, Alert, Typography, Stack } from '@mui/material';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
+import type { AlertColor } from '@mui/material';
 
 // Imports
 import Navbar from './components/Navbar';
@@ -18,6 +19,7 @@ import LockedView from './components/LockedView';
 import AuthModal from './components/AuthModal';
 import MethodologyCard from './components/MethodologyCard';
 import ProjectsModal from './components/ProjectsModal';
+import FeedbackSnackbar from './components/FeedbackSnackbar';
 
 import { performOptimization, getUserProjects, deleteProject } from './services/apiService';
 import type { OptimizationResponse, SystemInput, User } from './types/ControlSystems';
@@ -27,7 +29,21 @@ function App() {
   const [data, setData] = useState<OptimizationResponse | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
-  
+  const [snackbar, setSnackbar] = useState<{
+    open: boolean;
+    message: string;
+    severity: AlertColor;
+  }>({
+    open: false,
+    message: '',
+    severity: 'success',
+  });
+
+  const showNotify = (message: string, severity: AlertColor = 'success') => {
+    setSnackbar({ open: true, message, severity });
+  };
+
+
   // Auth & Modals State
   const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
   const [authOpen, setAuthOpen] = useState<boolean>(false);
@@ -64,8 +80,10 @@ function App() {
       const response = await performOptimization(input, currentUser.id);
       setData(response);
       loadHistory(currentUser.id);
+      showNotify("Optimization successful! Parameters updated.", "success");
     } catch (err) {
       setError("Backend connection error.");
+      showNotify("Optimization failed. Check server status.", "error");
     } finally {
       setLoading(false);
     }
@@ -74,42 +92,48 @@ function App() {
   const handleDeleteProject = async (projectId: string) => {
     if (!currentUser) return;
     if (window.confirm("Delete this project permanently?")) {
-      await deleteProject(projectId);
-      loadHistory(currentUser.id);
-      setData(null);
+        try {
+            await deleteProject(projectId);
+            loadHistory(currentUser.id);
+            setData(null);
+            showNotify("Project removed from database.", "info");
+        } catch (err) {
+            showNotify("Failed to delete project.", "error");
+        }
     }
-  };
+};
 
   const handleSelectProject = (proj: any) => {
-      setData({
-          success: true,
-          compensator: proj.results,
-          margins: { pm: proj.results.pm || 0, gm: proj.results.gm || 0 },
-          bode: { 
-            original: { frequency: [], magnitude: [], phase: [] }, 
-            compensated: { frequency: [], magnitude: [], phase: [] } 
-          },
-          meta: { executionTime: 0, timestamp: proj.createdAt }
-      });
+    setData({
+      success: true,
+      compensator: proj.results,
+      margins: { pm: proj.results.pm || 0, gm: proj.results.gm || 0 },
+      bode: {
+        original: { frequency: [], magnitude: [], phase: [] },
+        compensated: { frequency: [], magnitude: [], phase: [] }
+      },
+      meta: { executionTime: 0, timestamp: proj.createdAt }
+    });
   };
 
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />
       <Box sx={{ minHeight: '100vh', pb: 6, bgcolor: 'background.default' }}>
-        
+
         <Navbar
           mode={mode}
           onToggleTheme={toggleTheme}
           onOpenAuth={() => setAuthOpen(true)}
           isLoggedIn={isLoggedIn}
           user={currentUser}
-          onOpenProjects={() => setProjectsOpen(true)} 
+          onOpenProjects={() => setProjectsOpen(true)}
           onLogout={() => {
             setIsLoggedIn(false);
             setCurrentUser(null);
             setHistory([]);
             setData(null);
+            showNotify("Logged out successfully. See you soon!", "info");
           }}
         />
 
@@ -121,7 +145,7 @@ function App() {
           </Box>
 
           {isLoggedIn ? (
-            <Grid container spacing={4}> 
+            <Grid container spacing={4}>
 
               <Grid size={{ xs: 12, md: 4 }}>
                 <Stack spacing={3}>
@@ -166,19 +190,30 @@ function App() {
             setCurrentUser(userData);
             setIsLoggedIn(true);
             setAuthOpen(false);
-            if(userData.id) loadHistory(userData.id);
+            if (userData.id) loadHistory(userData.id);
+            const firstName = userData.fullName.split(' ')[0];
+            showNotify(`Welcome back, ${firstName}!`, 'success');
           }}
+          onNotify={showNotify} 
         />
 
-        <ProjectsModal 
-            open={projectsOpen}
-            onClose={() => setProjectsOpen(false)}
-            projects={history}
-            onSelectProject={handleSelectProject}
-            onDeleteProject={handleDeleteProject}
+        <ProjectsModal
+          open={projectsOpen}
+          onClose={() => setProjectsOpen(false)}
+          projects={history}
+          onSelectProject={handleSelectProject}
+          onDeleteProject={handleDeleteProject}
         />
 
       </Box>
+
+      <FeedbackSnackbar
+        open={snackbar.open}
+        message={snackbar.message}
+        severity={snackbar.severity}
+        onClose={() => setSnackbar({ ...snackbar, open: false })}
+      />
+
     </ThemeProvider>
   );
 }
