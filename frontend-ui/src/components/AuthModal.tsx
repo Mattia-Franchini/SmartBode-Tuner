@@ -9,9 +9,11 @@
 import React, { useState } from 'react';
 import { 
     Dialog, DialogContent, TextField, Button, Typography, 
-    Box, Stack, IconButton, Tabs, Tab, Alert 
+    Box, Stack, IconButton, Tabs, Tab, Alert, InputAdornment
 } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
+import Visibility from '@mui/icons-material/Visibility';
+import VisibilityOff from '@mui/icons-material/VisibilityOff';
 import { loginUser, registerUser } from '../services/authService';
 import type { User } from '../types/ControlSystems'; 
 import type { AlertColor } from '@mui/material';
@@ -31,15 +33,48 @@ const AuthModal: React.FC<AuthModalProps> = ({ open, onClose, onLoginSuccess, on
     const [fullName, setFullName] = useState('');
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
+    const [showPassword, setShowPassword] = useState(false);
     
     // UI State
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
 
     /**
+     * Name Validation: Letters and spaces only, 2-50 characters.
+     */
+    const isNameValid = (name: string) => /^[a-zA-Z\s]{2,50}$/.test(name.trim());
+
+    /**
+     * Regex for email validation.
+     */
+    const isEmailValid = (email: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+
+    /**
+     * Password requirements: min 8 chars and at least 1 number.
+     */
+    const isPasswordStrong = (pass: string) => pass.length >= 8 && /\d/.test(pass);
+
+    /**
+     * Toggles password visibility.
+     */
+    const handleClickShowPassword = () => setShowPassword(!showPassword);
+
+    /**
      * Handles the form submission for both Login and Registration.
      */
     const handleSubmit = async () => {
+        if (tabIndex === 1 && !isNameValid(fullName)) {
+            setError("Please enter a valid full name (letters only, min 2 chars).");
+            return;
+        }
+        if (!isEmailValid(email)) {
+            setError("Please enter a valid email address.");
+            return;
+        }
+        if (tabIndex === 1 && !isPasswordStrong(password)) {
+            setError("Password must be at least 8 characters long and contain at least one number.");
+            return;
+        }
         setLoading(true);
         setError(null);
         try {
@@ -67,23 +102,16 @@ const AuthModal: React.FC<AuthModalProps> = ({ open, onClose, onLoginSuccess, on
     };
 
     return (
-        <Dialog 
-            open={open} 
-            onClose={onClose} 
-            maxWidth="xs" 
-            fullWidth 
-            PaperProps={{ sx: { borderRadius: 4 } }}
-        >
+        <Dialog open={open} onClose={onClose} maxWidth="xs" fullWidth PaperProps={{ sx: { borderRadius: 4 } }}>
             <Box sx={{ display: 'flex', justifyContent: 'flex-end', p: 1 }}>
                 <IconButton onClick={onClose} size="small"><CloseIcon /></IconButton>
             </Box>
-            
             <DialogContent sx={{ pt: 0 }}>
                 <Typography variant="h5" fontWeight="800" align="center" gutterBottom>
                     {tabIndex === 0 ? "Welcome Back" : "Create Account"}
                 </Typography>
 
-                <Tabs value={tabIndex} onChange={(_, v) => setTabIndex(v)} centered sx={{ mb: 3 }}>
+                <Tabs value={tabIndex} onChange={(_, v) => { setTabIndex(v); setError(null); }} centered sx={{ mb: 3 }}>
                     <Tab label="Login" />
                     <Tab label="Register" />
                 </Tabs>
@@ -94,31 +122,45 @@ const AuthModal: React.FC<AuthModalProps> = ({ open, onClose, onLoginSuccess, on
                     {tabIndex === 1 && (
                         <TextField 
                             fullWidth label="Full Name" 
-                            value={fullName} 
-                            onChange={(e) => setFullName(e.target.value)} 
+                            variant="outlined"
+                            value={fullName} onChange={(e) => setFullName(e.target.value)} 
                         />
                     )}
+                    
                     <TextField 
                         fullWidth label="Email Address" 
-                        value={email} 
-                        onChange={(e) => setEmail(e.target.value)} 
+                        variant="outlined"
+                        error={email !== '' && !isEmailValid(email)}
+                        value={email} onChange={(e) => setEmail(e.target.value)} 
                     />
+
                     <TextField 
-                        fullWidth label="Password" 
-                        type="password" 
+                        fullWidth 
+                        label="Password" 
+                        type={showPassword ? 'text' : 'password'} 
+                        variant="outlined"
                         value={password} 
                         onChange={(e) => setPassword(e.target.value)} 
+                        InputProps={{
+                            endAdornment: (
+                                <InputAdornment position="end">
+                                    <IconButton onClick={handleClickShowPassword} edge="end">
+                                        {showPassword ? <VisibilityOff /> : <Visibility />}
+                                    </IconButton>
+                                </InputAdornment>
+                            ),
+                        }}
+                        helperText={tabIndex === 1 ? "Min 8 characters + 1 number" : ""}
                     />
 
                     <Button 
                         variant="contained" 
-                        fullWidth 
-                        size="large" 
+                        fullWidth size="large" 
                         onClick={handleSubmit}
-                        disabled={loading}
+                        disabled={loading || (tabIndex === 1 && (!isEmailValid(email) || !isPasswordStrong(password)))}
                         sx={{ mt: 2, fontWeight: 'bold', height: 50, borderRadius: 2 }}
                     >
-                        {loading ? "Authenticating..." : (tabIndex === 0 ? "Sign In" : "Register")}
+                        {loading ? "Processing..." : (tabIndex === 0 ? "Sign In" : "Register")}
                     </Button>
                 </Stack>
             </DialogContent>
