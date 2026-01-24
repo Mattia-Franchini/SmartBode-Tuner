@@ -1,80 +1,63 @@
 """
 File: main.py
-Description: Main entry point for the AI Computational Engine (Microservice).
-             It exposes REST endpoints using FastAPI to perform Differential Evolution
-             optimization for Lead/Lag compensators.
+Description: FastAPI wrapper for the SmartBode AI Engine.
+             Exposes the placeholder optimization logic to the Node.js backend.
 
 Authors: Mattia Franchini & Michele Bisignano
-Version: 1.0.0
+Version: 0.9.0 (Placeholder)
 """
 
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI
 from pydantic import BaseModel
-from typing import List, Optional
-import random
+from typing import List
 import time
-from datetime import datetime
+from core_logic import BodeOptimizer
 
-app = FastAPI(
-    title="SmartBode AI Engine",
-    description="Microservice for Control System Optimization",
-    version="1.0.0"
-)
+app = FastAPI(title="SmartBode AI Engine - Placeholder Version")
 
-class SystemInput(BaseModel):
+class OptimizationRequest(BaseModel):
     numerator: List[float]
     denominator: List[float]
     targetPhaseMargin: float
 
-def generate_bode_points():
-    """Genera punti casuali per simulare un grafico di Bode"""
-    freqs = [0.1, 0.5, 1.0, 5.0, 10.0, 50.0, 100.0]
-    
-    mag = [random.uniform(20, 40) - (i * 10) for i in range(len(freqs))]
-    
-    phase = [random.uniform(-5, 0) - (i * 25) for i in range(len(freqs))]
-    
-    return {"frequency": freqs, "magnitude": mag, "phase": phase}
-
-
-@app.get("/")
-def health_check():
-    return {"status": "AI Engine Online", "authors": ["Mattia", "Michele"]}
-
 @app.post("/optimize")
-def optimize_system(data: SystemInput):
-    print(f"--> Richiesta ricevuta: Target PM {data.targetPhaseMargin}°")
+async def optimize_endpoint(request: OptimizationRequest):
+    """
+    POST endpoint that receives plant data and returns optimized results.
+    Includes a simulated delay to mimic real computational effort.
+    """
+    start_time = time.time()
     
-    time.sleep(1.5)
-
-    mock_compensator = {
-        "K": round(random.uniform(1.0, 10.0), 4),
-        "T": round(random.uniform(0.01, 1.0), 4),
-        "alpha": round(random.uniform(0.05, 0.5), 4),
-        "type": random.choice(["LEAD", "LAG"])
-    }
-
-    achieved_pm = data.targetPhaseMargin + random.uniform(-2, 2)
-    achieved_gm = random.uniform(10, 20)
-
-    bode_original = generate_bode_points()
+    # 1. Initialize the placeholder engine
+    engine = BodeOptimizer(
+        numerator=request.numerator, 
+        denominator=request.denominator, 
+        target_pm=request.targetPhaseMargin
+    )
     
-    bode_compensated = generate_bode_points()
-    bode_compensated["phase"] = [p + 20 for p in bode_compensated["phase"]]
-
+    # 2. Get fake but well-structured results
+    # Simulated computation time (1 second)
+    time.sleep(1.0)
+    
+    result = engine.optimize()
+    bode_data = engine.get_bode_data()
+    
+    # 3. Final JSON response assembly
     return {
         "success": True,
-        "compensator": mock_compensator,
+        "compensator": {
+            "K": result["K"],
+            "T": result["T"],
+            "alpha": result["alpha"],
+            "type": result["type"]
+        },
         "margins": {
-            "pm": round(achieved_pm, 2),
-            "gm": round(achieved_gm, 2)
+            "pm": result["phaseMargin"],
+            "gm": result["gainMargin"]
         },
-        "bode": {
-            "original": bode_original,
-            "compensated": bode_compensated
-        },
+        "bode": bode_data,
         "meta": {
-            "executionTime": 1500, # ms
-            "timestamp": datetime.now().isoformat()
+            "executionTime": int((time.time() - start_time) * 1000),
+            "engine": "v0.9-placeholder"
         }
     }
