@@ -1,5 +1,6 @@
 ```
 SmartBode-Tuner/
+├── .gitignore
 ├── ai-engine/
 │   ├── core_logic.py
 │   ├── main.py
@@ -19,8 +20,10 @@ SmartBode-Tuner/
 │
 ├── Docs/
 │   └── Project_Structure/
+│       └── repository_tree.md
 │
 ├── frontend-ui/
+│   ├── .gitignore
 │   ├── cypress/
 │   │   ├── e2e/
 │   │   │   └── full_stack_flow.cy.ts
