@@ -7,9 +7,9 @@
  */
 
 import React, { useState } from 'react';
-import { 
-    AppBar, Toolbar, Typography, Button, IconButton, Box, Stack, Container, 
-    Avatar, Menu, MenuItem, ListItemIcon, Divider 
+import {
+    AppBar, Toolbar, Typography, Button, IconButton, Box, Stack, Container,
+    Avatar, Menu, MenuItem, ListItemIcon, Divider
 } from '@mui/material';
 
 // Icons
@@ -19,8 +19,8 @@ import TuneIcon from '@mui/icons-material/Tune';
 import LogoutIcon from '@mui/icons-material/Logout';
 import FolderSharedIcon from '@mui/icons-material/FolderShared';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
-import PersonIcon from '@mui/icons-material/Person';     
-import SettingsIcon from '@mui/icons-material/Settings'; 
+import PersonIcon from '@mui/icons-material/Person';
+import SettingsIcon from '@mui/icons-material/Settings';
 
 import type { User } from '../types/ControlSystems';
 import { getGreeting } from '../utils/timeUtils';
@@ -28,9 +28,9 @@ import { getGreeting } from '../utils/timeUtils';
 interface NavbarProps {
     mode: 'light' | 'dark';
     onToggleTheme: () => void;
-    onOpenAuth: () => void;   
-    isLoggedIn: boolean;      
-    onLogout: () => void; 
+    onOpenAuth: () => void;
+    isLoggedIn: boolean;
+    onLogout: () => void;
     user: User | null;
     onOpenProjects: () => void;
 }
@@ -42,7 +42,7 @@ const Navbar: React.FC<NavbarProps> = ({ mode, onToggleTheme, isLoggedIn, onLogo
     const handleMenuClick = (event: React.MouseEvent<HTMLElement>) => {
         setAnchorEl(event.currentTarget);
     };
-    
+
     const handleMenuClose = () => {
         setAnchorEl(null);
     };
@@ -82,7 +82,7 @@ const Navbar: React.FC<NavbarProps> = ({ mode, onToggleTheme, isLoggedIn, onLogo
                         {isLoggedIn && user ? (
                             <>
                                 {/* USER DROPDOWN TRIGGER */}
-                                <Button 
+                                <Button
                                     onClick={handleMenuClick}
                                     color="inherit"
                                     endIcon={<KeyboardArrowDownIcon />}
@@ -92,8 +92,8 @@ const Navbar: React.FC<NavbarProps> = ({ mode, onToggleTheme, isLoggedIn, onLogo
                                         {user.fullName.charAt(0)}
                                     </Avatar>
                                     <Typography variant="body2" sx={{ fontWeight: 500, color: 'text.secondary' }}>
-    {getGreeting(new Date().getHours())}, <Box component="span" sx={{ color: 'primary.main', fontWeight: 700 }}>{user.fullName}</Box>
-</Typography>
+                                        {getGreeting(new Date().getHours())}, <Box component="span" sx={{ color: 'primary.main', fontWeight: 700 }}>{user.fullName}</Box>
+                                    </Typography>
                                 </Button>
 
                                 {/* DROPDOWN MENU */}

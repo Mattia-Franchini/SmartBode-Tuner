@@ -88,6 +88,8 @@ export interface OptimizationResponse {
         gm: number;
     };
 
+    inputData?: SystemInput;
+    
     /** Metadata about the request execution. */
     meta: {
         /** Computational time in milliseconds. */

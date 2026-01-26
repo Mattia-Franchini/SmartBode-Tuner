@@ -77,10 +77,11 @@ function App() {
     setLoading(true);
     setError(null);
     try {
-      const response = await performOptimization(input, currentUser.id);
-      setData(response);
-      loadHistory(currentUser.id);
-      showNotify("Optimization successful! Parameters updated.", "success");
+      const response = await performOptimization(input, currentUser!.id);
+      const fullData = { ...response, inputData: input };
+      setData(fullData);
+      loadHistory(currentUser!.id);
+      showNotify("Optimization successful!", "success");
     } catch (err) {
       setError("Backend connection error.");
       showNotify("Optimization failed. Check server status.", "error");
@@ -92,22 +93,23 @@ function App() {
   const handleDeleteProject = async (projectId: string) => {
     if (!currentUser) return;
     if (window.confirm("Delete this project permanently?")) {
-        try {
-            await deleteProject(projectId);
-            loadHistory(currentUser.id);
-            setData(null);
-            showNotify("Project removed from database.", "info");
-        } catch (err) {
-            showNotify("Failed to delete project.", "error");
-        }
+      try {
+        await deleteProject(projectId);
+        loadHistory(currentUser.id);
+        setData(null);
+        showNotify("Project removed from database.", "info");
+      } catch (err) {
+        showNotify("Failed to delete project.", "error");
+      }
     }
-};
+  };
 
   const handleSelectProject = (proj: any) => {
     setData({
       success: true,
       compensator: proj.results,
       margins: { pm: proj.results.pm || 0, gm: proj.results.gm || 0 },
+      inputData: proj.inputData,
       bode: {
         original: { frequency: [], magnitude: [], phase: [] },
         compensated: { frequency: [], magnitude: [], phase: [] }
@@ -171,6 +173,7 @@ function App() {
                         compensator={data.compensator}
                         pm={data.margins?.pm || 0}
                         gm={data.margins?.gm || 0}
+                        plantInput={data.inputData || null}
                       />
                     </Grid>
                   )}
@@ -194,7 +197,7 @@ function App() {
             const firstName = userData.fullName.split(' ')[0];
             showNotify(`Welcome back, ${firstName}!`, 'success');
           }}
-          onNotify={showNotify} 
+          onNotify={showNotify}
         />
 
         <ProjectsModal
