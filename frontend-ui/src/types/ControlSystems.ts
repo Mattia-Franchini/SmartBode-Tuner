@@ -8,7 +8,7 @@
  * and compensator parameters).
  * 
  * @author [Mattia Franchini & Michele Bisignano]
- * @version 1.0.0
+ * @version 1.1.0
  */
 
 /**
@@ -24,6 +24,11 @@ export interface SystemInput {
 
     /** The desired Phase Margin in degrees (e.g., 50.0). */
     targetPhaseMargin: number;
+}
+
+export interface StepResponseData {
+    time: number[];      
+    amplitude: number[]; 
 }
 
 /**
@@ -79,6 +84,8 @@ export interface OptimizationResponse {
         compensated: BodePlotData;
     };
 
+    stepResponse: StepResponseData; 
+
     /** Achieved stability margins. */
     margins: {
         /** The actual Phase Margin achieved [deg]. */
@@ -89,7 +96,7 @@ export interface OptimizationResponse {
     };
 
     inputData?: SystemInput;
-    
+
     /** Metadata about the request execution. */
     meta: {
         /** Computational time in milliseconds. */

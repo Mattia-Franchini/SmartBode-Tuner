@@ -20,6 +20,7 @@ import AuthModal from './components/AuthModal';
 import MethodologyCard from './components/MethodologyCard';
 import ProjectsModal from './components/ProjectsModal';
 import FeedbackSnackbar from './components/FeedbackSnackbar';
+import StepResponsePlot from './components/StepResponsePlot';
 
 import { performOptimization, getUserProjects, deleteProject } from './services/apiService';
 import type { OptimizationResponse, SystemInput, User } from './types/ControlSystems';
@@ -110,6 +111,11 @@ function App() {
       compensator: proj.results,
       margins: { pm: proj.results.pm || 0, gm: proj.results.gm || 0 },
       inputData: proj.inputData,
+      stepResponse: {
+        time: [],
+        amplitude: []
+      },
+
       bode: {
         original: { frequency: [], magnitude: [], phase: [] },
         compensated: { frequency: [], magnitude: [], phase: [] }
@@ -174,6 +180,11 @@ function App() {
                         pm={data.margins?.pm || 0}
                         gm={data.margins?.gm || 0}
                         plantInput={data.inputData || null}
+                      />
+
+                      <StepResponsePlot
+                        data={data.stepResponse}
+                        isLoading={loading}
                       />
                     </Grid>
                   )}
