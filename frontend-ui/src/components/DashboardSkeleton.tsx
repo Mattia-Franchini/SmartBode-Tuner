@@ -1,66 +1,51 @@
 /**
  * @file DashboardSkeleton.tsx
- * @description Pulsating placeholders that mimic the results dashboard layout.
- * Used to improve perceived performance during AI computation.
+ * @description Specialized skeletons for the Bento Grid layout.
+ * Mimics the exact structure of the results area to prevent layout shift.
  * 
  * @authors Mattia Franchini & Michele Bisignano
- * @version 1.0.0
+ * @version 1.1.0
  */
 
 import React from 'react';
-import { Grid, Paper, Box, Skeleton, Stack } from '@mui/material';
+import { Grid, Box, Skeleton, Stack } from '@mui/material';
+import BentoTile from './BentoTile';
 
-const DashboardSkeleton: React.FC = () => {
+const DashboardSkeleton = () => {
     return (
         <Grid container spacing={3}>
-            {/* 1. KPI Cards Skeletons (The 3 Summary Cards) */}
+            {/* 1. KPI Skeletons (Row 1) */}
             <Grid size={{ xs: 12 }}>
                 <Grid container spacing={2}>
-                    {[1, 2, 3].map((item) => (
-                        <Grid size={{ xs: 12, sm: 4 }} key={item}>
-                            <Paper elevation={0} sx={{ p: 2, borderRadius: 3, border: '1px solid', borderColor: 'divider' }}>
-                                <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                                    <Skeleton variant="circular" width={40} height={40} sx={{ mr: 2 }} />
-                                    <Box sx={{ width: '100%' }}>
-                                        <Skeleton variant="text" width="60%" height={20} />
-                                        <Skeleton variant="text" width="40%" height={30} />
-                                    </Box>
-                                </Box>
-                            </Paper>
+                    {[1, 2, 3].map((i) => (
+                        <Grid size={{ xs: 12, sm: 4 }} key={i}>
+                            <Skeleton variant="rectangular" height={100} sx={{ borderRadius: 4 }} />
                         </Grid>
                     ))}
                 </Grid>
             </Grid>
 
-            {/* 2. Bode Plot Skeleton (The Big Chart) */}
+            {/* 2. Bode Plot Skeleton (Row 2 - Right part) */}
             <Grid size={{ xs: 12 }}>
-                <Paper elevation={0} sx={{ p: 3, borderRadius: 4, border: '1px solid', borderColor: 'divider' }}>
-                    <Skeleton variant="text" width="30%" height={32} sx={{ mb: 2 }} />
-                    <Skeleton variant="rectangular" width="100%" height={450} sx={{ borderRadius: 2 }} />
-                </Paper>
+                <BentoTile title="Analysis" sx={{ height: 450 }}>
+                    <Skeleton variant="text" width="40%" height={30} sx={{ mb: 2 }} />
+                    <Skeleton variant="rectangular" width="100%" height={350} sx={{ borderRadius: 2 }} />
+                </BentoTile>
             </Grid>
 
-            {/* 3. Results Card and Step Response Skeleton */}
-            <Grid size={{ xs: 12 }}>
-                <Stack spacing={3}>
-                    <Paper elevation={0} sx={{ p: 3, borderRadius: 4, border: '1px solid', borderColor: 'divider' }}>
-                        <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2 }}>
-                            <Skeleton variant="rectangular" width="40%" height={30} />
-                            <Skeleton variant="rectangular" width="15%" height={25} />
-                        </Box>
-                        <Skeleton variant="rectangular" width="100%" height={100} sx={{ borderRadius: 2, mb: 2 }} />
-                        <Grid container spacing={2}>
-                            {[1, 2, 3, 4].map((i) => (
-                                <Grid size={{ xs: 6 }} key={i}>
-                                    <Skeleton variant="text" width="80%" />
-                                    <Skeleton variant="text" width="50%" height={30} />
-                                </Grid>
-                            ))}
-                        </Grid>
-                    </Paper>
-                    <Skeleton variant="rectangular" width="100%" height={300} sx={{ borderRadius: 4 }} />
-                </Stack>
-            </Grid>
+            {/* 3. Bottom Row Skeletons (Row 3 - 4+4+4) */}
+            {[1, 2, 3].map((i) => (
+                <Grid size={{ xs: 12, md: 4 }} key={i}>
+                    <BentoTile sx={{ height: 300 }}>
+                        <Skeleton variant="circular" width={40} height={40} sx={{ mb: 2 }} />
+                        <Skeleton variant="rectangular" width="100%" height={150} sx={{ borderRadius: 2 }} />
+                        <Stack spacing={1} sx={{ mt: 2 }}>
+                            <Skeleton variant="text" width="80%" />
+                            <Skeleton variant="text" width="60%" />
+                        </Stack>
+                    </BentoTile>
+                </Grid>
+            ))}
         </Grid>
     );
 };

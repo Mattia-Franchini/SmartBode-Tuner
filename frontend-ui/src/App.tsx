@@ -9,6 +9,11 @@ import { useState, useMemo } from 'react';
 import { CssBaseline, Container, Box, Grid, Alert, Typography, Stack } from '@mui/material';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import type { AlertColor } from '@mui/material';
+import PsychologyIcon from '@mui/icons-material/Psychology';
+import SettingsInputComponentIcon from '@mui/icons-material/SettingsInputComponent';
+import ShowChartIcon from '@mui/icons-material/ShowChart';
+import AnalyticsIcon from '@mui/icons-material/Analytics';
+import FunctionsIcon from '@mui/icons-material/Functions';
 
 // Imports
 import Navbar from './components/Navbar';
@@ -23,6 +28,7 @@ import FeedbackSnackbar from './components/FeedbackSnackbar';
 import StepResponsePlot from './components/StepResponsePlot';
 import SummaryCards from './components/SummaryCards';
 import DashboardSkeleton from './components/DashboardSkeleton';
+import BentoTile from './components/BentoTile';
 
 import { performOptimization, getUserProjects, deleteProject, updateProjectName } from './services/apiService';
 import type { OptimizationResponse, SystemInput, User } from './types/ControlSystems';
@@ -159,6 +165,7 @@ function App() {
         />
 
         <Container maxWidth="xl" sx={{ mt: 4 }}>
+          {/* Authors Tag */}
           <Box sx={{ mb: 2, textAlign: 'right' }}>
             <Typography variant="caption" color="text.secondary">
               System Architects: <strong>Mattia Franchini & Michele Bisignano</strong>
@@ -166,54 +173,64 @@ function App() {
           </Box>
 
           {isLoggedIn ? (
-            <Grid container spacing={4}>
+            <Grid container spacing={3} alignItems="stretch">
 
+              {/* --- LEFT COLUMN: ALWAYS VISIBLE --- */}
               <Grid size={{ xs: 12, md: 4 }}>
-                <Stack spacing={3}>
-                  <SystemInputForm onSubmit={handleOptimization} isLoading={loading} />
-                  <MethodologyCard />
-                  {error && <Alert severity="error">{error}</Alert>}
+                <Stack spacing={3} sx={{ height: '100%' }}>
+                  <BentoTile title="Design Config" icon={<SettingsInputComponentIcon />}>
+                    <SystemInputForm onSubmit={handleOptimization} isLoading={loading} />
+                  </BentoTile>
+                  {!loading && <BentoTile title="AI Methodology" icon={<PsychologyIcon />}><MethodologyCard /></BentoTile>}
                 </Stack>
               </Grid>
 
+              {/* --- RIGHT COLUMN: DYNAMIC AREA --- */}
               <Grid size={{ xs: 12, md: 8 }}>
 
-              {loading && <DashboardSkeleton />}
-              
-                <Grid container spacing={3}>
-                  {data && data.compensator && !loading && (
+                {loading ? (
+                  <DashboardSkeleton />
+                ) : !data ? (
+                  <BentoTile sx={{ height: '100%', minHeight: '600px', display: 'flex', alignItems: 'center', justifyContent: 'center', border: '2px dashed' }}>
+                    <Typography color="text.secondary">Configure system parameters to start analysis</Typography>
+                  </BentoTile>
+                ) : (
+                  <Grid container spacing={3}>
+                    {/* Row 1: KPI Summary */}
                     <Grid size={{ xs: 12 }}>
-                      <SummaryCards
-                        pm={data.margins?.pm || 0}
-                        gain={data.compensator.K}
-                        type={data.compensator.type}
-                      />
+                      <SummaryCards pm={data.margins.pm} gain={data.compensator.K} type={data.compensator.type} />
                     </Grid>
-                  )}
-                  <Grid size={{ xs: 12 }}>
-                    <BodePlot
-                      data={data?.bode?.compensated ?? null}
-                      originalData={data?.bode?.original ?? null}
-                      isLoading={loading}
-                      title="Frequency Response Analysis"
-                    />
-                  </Grid>
-                  {data && data.compensator && !loading && (
-                    <Grid size={{ xs: 12 }}>
-                      <CompensatorDetails
-                        compensator={data.compensator}
-                        pm={data.margins?.pm || 0}
-                        gm={data.margins?.gm || 0}
-                        plantInput={data.inputData || null}
-                      />
 
-                      <StepResponsePlot
-                        data={data.stepResponse}
-                        isLoading={loading}
-                      />
+                    {/* Row 2: Bode Plot */}
+                    <Grid size={{ xs: 12 }}>
+                      <BentoTile title="Frequency Response" icon={<ShowChartIcon />}>
+                        <BodePlot
+                          data={data?.bode?.compensated ?? null}
+                          originalData={data?.bode?.original ?? null}
+                          title=""
+                        />
+                      </BentoTile>
                     </Grid>
-                  )}
-                </Grid>
+
+                    {/* Row 3: Technical Details & Step Response */}
+                    <Grid size={{ xs: 12, md: 6 }}>
+                      <BentoTile title="Compensator Details" icon={<FunctionsIcon />} sx={{ height: '100%' }}>
+                        <CompensatorDetails
+                          compensator={data.compensator}
+                          pm={data.margins.pm}
+                          gm={data.margins.gm}
+                          plantInput={data.inputData || null}
+                        />
+                      </BentoTile>
+                    </Grid>
+
+                    <Grid size={{ xs: 12, md: 6 }}>
+                      <BentoTile title="Time Domain" icon={<AnalyticsIcon />} sx={{ height: '100%' }}>
+                        <StepResponsePlot data={data?.stepResponse} />
+                      </BentoTile>
+                    </Grid>
+                  </Grid>
+                )}
               </Grid>
 
             </Grid>

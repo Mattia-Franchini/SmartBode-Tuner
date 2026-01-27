@@ -1,37 +1,115 @@
 /**
  * @file MethodologyCard.tsx
- * @description Academic context card to balance the UI layout.
+ * @description Academic context card showcasing the AI optimization strategy.
+ * Features improved mathematical symbol rendering for K, T, and Alpha.
  * 
  * @authors Mattia Franchini & Michele Bisignano
- * @version 1.1.0
+ * @version 1.2.1
  */
 
 import React from 'react';
-import { Paper, Typography, Box, Stack, Avatar } from '@mui/material';
-import PsychologyIcon from '@mui/icons-material/Psychology';
+import { Typography, Box, Stack, List, ListItem, ListItemIcon, ListItemText, Divider, Chip } from '@mui/material';
+import AutoGraphIcon from '@mui/icons-material/AutoGraph';
+import SecurityIcon from '@mui/icons-material/Security';
+import SpeedIcon from '@mui/icons-material/Speed';
 import PrecisionManufacturingIcon from '@mui/icons-material/PrecisionManufacturing';
+
+/**
+ * A small helper component to render mathematical variables 
+ * with a LaTeX-like serif italic style.
+ */
+const MathVar = ({ children }: { children: React.ReactNode }) => (
+    <Box 
+        component="span" 
+        sx={{ 
+            fontFamily: '"Times New Roman", Times, serif', 
+            fontStyle: 'italic', 
+            fontWeight: 'bold',
+            mx: 0.2,
+            fontSize: '1.1rem',
+            color: 'primary.main'
+        }}
+    >
+        {children}
+    </Box>
+);
 
 const MethodologyCard = () => {
     return (
-        <Paper elevation={3} sx={{ p: 3, borderRadius: 4, bgcolor: 'primary.main', color: 'primary.contrastText' }}>
-            <Stack spacing={2}>
-                <Stack direction="row" spacing={2} alignItems="center">
-                    <Avatar sx={{ bgcolor: 'rgba(255,255,255,0.2)' }}>
-                        <PsychologyIcon />
-                    </Avatar>
-                    <Typography variant="subtitle1" fontWeight="bold">AI Engine Status</Typography>
-                </Stack>
-                
-                <Typography variant="body2" sx={{ opacity: 0.9 }}>
-                    The system uses <strong>Differential Evolution</strong> to minimize the error between current and target Phase Margin.
+        <Box sx={{ p: 1 }}>
+            <Stack spacing={2.5}>
+                {/* 1. Introductory Text with Formatted Math Variables */}
+                <Typography variant="body2" color="text.secondary" sx={{ lineHeight: 1.6 }}>
+                    The synthesis engine employs a <strong>Differential Evolution (DE)</strong> metaheuristic to identify the global optimum in the 
+                    <MathVar>K</MathVar>, <MathVar>T</MathVar>, <MathVar>α</MathVar> parameter space.
                 </Typography>
 
-                <Box sx={{ p: 1.5, bgcolor: 'rgba(255,255,255,0.1)', borderRadius: 2, display: 'flex', alignItems: 'center' }}>
-                    <PrecisionManufacturingIcon sx={{ fontSize: 20, mr: 1 }} />
-                    <Typography variant="caption">Status: Ready for Synthesis</Typography>
+                <Divider sx={{ borderStyle: 'dashed' }} />
+
+                {/* 2. Core Pillars of the Algorithm */}
+                <Typography variant="caption" fontWeight="800" color="primary" sx={{ textTransform: 'uppercase', letterSpacing: 1.5 }}>
+                    Optimization Pillars
+                </Typography>
+
+                <List sx={{ p: 0 }}>
+                    <ListItem disableGutters sx={{ py: 0.5 }}>
+                        <ListItemIcon sx={{ minWidth: 35 }}>
+                            <SecurityIcon color="primary" fontSize="small" />
+                        </ListItemIcon>
+                        <ListItemText 
+                            primary="Stability Enforcement" 
+                            secondary="Strict pole-placement verification."
+                            primaryTypographyProps={{ variant: 'body2', fontWeight: 'bold' }}
+                            secondaryTypographyProps={{ variant: 'caption' }}
+                        />
+                    </ListItem>
+
+                    <ListItem disableGutters sx={{ py: 0.5 }}>
+                        <ListItemIcon sx={{ minWidth: 35 }}>
+                            <AutoGraphIcon color="primary" fontSize="small" />
+                        </ListItemIcon>
+                        <ListItemText 
+                            primary="Fitness Logic" 
+                            secondary="Quadratic error minimization for Target PM."
+                            primaryTypographyProps={{ variant: 'body2', fontWeight: 'bold' }}
+                            secondaryTypographyProps={{ variant: 'caption' }}
+                        />
+                    </ListItem>
+
+                    <ListItem disableGutters sx={{ py: 0.5 }}>
+                        <ListItemIcon sx={{ minWidth: 35 }}>
+                            <SpeedIcon color="primary" fontSize="small" />
+                        </ListItemIcon>
+                        <ListItemText 
+                            primary="Stochastic Search" 
+                            secondary="Ensures finding the global minimum."
+                            primaryTypographyProps={{ variant: 'body2', fontWeight: 'bold' }}
+                            secondaryTypographyProps={{ variant: 'caption' }}
+                        />
+                    </ListItem>
+                </List>
+
+                {/* 3. Technical Meta-data Chips */}
+                <Box sx={{ 
+                    mt: 1, 
+                    p: 2, 
+                    borderRadius: 3, 
+                    bgcolor: 'action.hover', 
+                    border: '1px solid', 
+                    borderColor: 'divider' 
+                }}>
+                    <Stack direction="row" alignItems="center" spacing={1} mb={1}>
+                        <PrecisionManufacturingIcon sx={{ fontSize: 18, color: 'text.secondary' }} />
+                        <Typography variant="caption" fontWeight="bold">COMPUTATIONAL SPECS</Typography>
+                    </Stack>
+                    <Stack direction="row" spacing={1} flexWrap="wrap" useFlexGap>
+                        <Chip label="LTI Model" size="small" variant="outlined" sx={{ fontSize: '0.65rem', height: 20 }} />
+                        <Chip label="Lead/Lag" size="small" variant="outlined" sx={{ fontSize: '0.65rem', height: 20 }} />
+                        <Chip label="Evolutionary" size="small" variant="outlined" sx={{ fontSize: '0.65rem', height: 20 }} />
+                    </Stack>
                 </Box>
             </Stack>
-        </Paper>
+        </Box>
     );
 };
 

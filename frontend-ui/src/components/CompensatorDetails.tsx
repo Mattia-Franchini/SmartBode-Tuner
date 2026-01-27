@@ -8,7 +8,7 @@
  */
 
 import React, { useState, useEffect } from 'react';
-import { Paper, Typography, Box, Grid, Divider, Chip, Button, Stack, Slider, IconButton, Tooltip } from '@mui/material';
+import {Typography, Box, Grid, Divider, Chip, Button, Stack, Slider, IconButton, Tooltip } from '@mui/material';
 import DownloadIcon from '@mui/icons-material/Download';
 import PictureAsPdfIcon from '@mui/icons-material/PictureAsPdf';
 import RestartAltIcon from '@mui/icons-material/RestartAlt';
@@ -28,7 +28,7 @@ interface CompensatorDetailsProps {
     plantInput: SystemInput | null;
 }
 
-const CompensatorDetails: React.FC<CompensatorDetailsProps> = ({ compensator, pm, gm, plantInput  }) => {
+const CompensatorDetails: React.FC<CompensatorDetailsProps> = ({ compensator, pm, gm, plantInput }) => {
     // 1. Local state to track the user-modified gain value (K)
     const [currentK, setCurrentK] = useState<number>(compensator.K);
 
@@ -69,7 +69,7 @@ const CompensatorDetails: React.FC<CompensatorDetailsProps> = ({ compensator, pm
     };
 
     return (
-        <Paper elevation={3} sx={{ p: 3, borderLeft: '6px solid #4caf50', borderRadius: 4 }}>
+        <Box>
             {/* Header: Title and Network Topology Identifier */}
             <Stack direction="row" justifyContent="space-between" alignItems="center" mb={2}>
                 <Typography variant="h6" fontWeight="800" color="success.main">
@@ -206,18 +206,18 @@ const CompensatorDetails: React.FC<CompensatorDetailsProps> = ({ compensator, pm
                     fullWidth
                     size="small"
                     startIcon={<TerminalIcon />}
-                    disabled={!plantInput} 
+                    disabled={!plantInput}
                     onClick={() => plantInput && downloadMatlabFile(plantInput, { ...compensator, K: currentK })}
                     sx={{
                         borderRadius: 2,
-                        bgcolor: '#d95319', 
+                        bgcolor: '#d95319',
                         '&:hover': { bgcolor: '#a63e12' }
                     }}
                 >
                     MATLAB
                 </Button>
             </Stack>
-        </Paper>
+        </Box>
     );
 };
 

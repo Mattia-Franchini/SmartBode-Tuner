@@ -8,7 +8,7 @@
 
 import React from 'react';
 import Plot from 'react-plotly.js';
-import { Paper, Box, CircularProgress, Typography } from '@mui/material';
+import {Box, CircularProgress, Typography } from '@mui/material';
 import type { Data, Layout } from 'plotly.js';
 import type { StepResponseData } from '../types/ControlSystems';
 
@@ -21,10 +21,10 @@ const StepResponsePlot: React.FC<StepResponseProps> = ({ data, isLoading }) => {
     
     if (isLoading) {
         return (
-            <Paper elevation={3} sx={{ height: 300, display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: 4, mt: 3 }}>
+            <Box>
                 <CircularProgress size={30} />
                 <Typography variant="body2" sx={{ ml: 2, color: 'text.secondary' }}>Simulating Step Response...</Typography>
-            </Paper>
+            </Box>
         );
     }
 
@@ -62,7 +62,7 @@ const StepResponsePlot: React.FC<StepResponseProps> = ({ data, isLoading }) => {
     };
 
     return (
-        <Paper elevation={3} sx={{ p: 2, borderRadius: 4, mt: 3 }}>
+        <Box>
             <Box sx={{ width: '100%', height: 300 }}>
                 <Plot
                     useResizeHandler
@@ -72,7 +72,7 @@ const StepResponsePlot: React.FC<StepResponseProps> = ({ data, isLoading }) => {
                     config={{ responsive: true, displaylogo: false }}
                 />
             </Box>
-        </Paper>
+        </Box>
     );
 };
 
