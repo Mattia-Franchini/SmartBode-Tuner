@@ -22,6 +22,7 @@ import ProjectsModal from './components/ProjectsModal';
 import FeedbackSnackbar from './components/FeedbackSnackbar';
 import StepResponsePlot from './components/StepResponsePlot';
 import SummaryCards from './components/SummaryCards';
+import DashboardSkeleton from './components/DashboardSkeleton';
 
 import { performOptimization, getUserProjects, deleteProject, updateProjectName } from './services/apiService';
 import type { OptimizationResponse, SystemInput, User } from './types/ControlSystems';
@@ -176,6 +177,9 @@ function App() {
               </Grid>
 
               <Grid size={{ xs: 12, md: 8 }}>
+
+              {loading && <DashboardSkeleton />}
+              
                 <Grid container spacing={3}>
                   {data && data.compensator && !loading && (
                     <Grid size={{ xs: 12 }}>
