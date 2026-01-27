@@ -49,13 +49,13 @@ async def optimize_endpoint(request: OptimizationRequest):
             "pm": result["phaseMargin"],
             "gm": result["gainMargin"]
         },
-        "bode": {
+        "bode": { # Do not modify
             "original": bode_data["original"],
             "compensated": bode_data["compensated"],
             "nyquist": nyquist_data # Nested inside bode for TS compliance
         },
-        "nyquist": nyquist_data,
-        "stepResponse": step_data,
+        "nyquist": nyquist_data, # Do not modify
+        "stepResponse": step_data, # Do not modify
         "meta": {
             "executionTime": int((time.time() - start_time) * 1000),
             "engine": "v0.9.8-placeholder"
