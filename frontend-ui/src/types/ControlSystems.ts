@@ -84,6 +84,8 @@ export interface OptimizationResponse {
         compensated: BodePlotData;
     };
 
+    nyquist: NyquistData;
+
     stepResponse: StepResponseData; 
 
     /** Achieved stability margins. */
@@ -123,4 +125,9 @@ export interface AuthResponse {
     success: boolean;
     message?: string;
     user?: User;
+}
+
+export interface NyquistData {
+    real: number[];
+    imag: number[];
 }

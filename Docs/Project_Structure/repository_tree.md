@@ -57,6 +57,7 @@ SmartBodeTuner/
 │   │   │   │   ├── BodePlot.tsx
 │   │   │   │   ├── CompensatorDetails.tsx
 │   │   │   │   ├── MethodologyCard.tsx
+│   │   │   │   ├── NyquistPlot.tsx
 │   │   │   │   ├── StepResponsePlot.tsx
 │   │   │   │   ├── SummaryCards.tsx
 │   │   │   │   └── SystemInputForm.tsx

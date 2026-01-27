@@ -14,6 +14,7 @@ import SettingsInputComponentIcon from '@mui/icons-material/SettingsInputCompone
 import ShowChartIcon from '@mui/icons-material/ShowChart';
 import AnalyticsIcon from '@mui/icons-material/Analytics';
 import FunctionsIcon from '@mui/icons-material/Functions';
+import TollIcon from '@mui/icons-material/Toll';
 
 // Imports
 import Navbar from './components/layout/Navbar';
@@ -26,6 +27,7 @@ import MethodologyCard from './components/dashboard/MethodologyCard';
 import ProjectsModal from './components/modals/ProjectsModal';
 import FeedbackSnackbar from './components/feedback/FeedbackSnackbar';
 import StepResponsePlot from './components/dashboard/StepResponsePlot';
+import NyquistPlot from './components/dashboard/NyquistPlot';
 import SummaryCards from './components/dashboard/SummaryCards';
 import DashboardSkeleton from './components/feedback/DashboardSkeleton';
 import BentoTile from './components/layout/BentoTile';
@@ -119,16 +121,13 @@ function App() {
       compensator: proj.results,
       margins: { pm: proj.results.pm || 0, gm: proj.results.gm || 0 },
       inputData: proj.inputData,
-      stepResponse: {
-        time: [],
-        amplitude: []
-      },
-
+      stepResponse: { time: [], amplitude: [] },
       bode: {
         original: { frequency: [], magnitude: [], phase: [] },
         compensated: { frequency: [], magnitude: [], phase: [] }
       },
-      meta: { executionTime: 0, timestamp: proj.createdAt }
+      meta: { executionTime: 0, timestamp: proj.createdAt },
+      nyquist: { real: [], imag: [] },
     });
   };
 
@@ -212,22 +211,40 @@ function App() {
                       </BentoTile>
                     </Grid>
 
-                    {/* Row 3: Technical Details & Step Response */}
-                    <Grid size={{ xs: 12, md: 6 }}>
-                      <BentoTile title="Compensator Details" icon={<FunctionsIcon />} sx={{ height: '100%' }}>
-                        <CompensatorDetails
-                          compensator={data.compensator}
-                          pm={data.margins.pm}
-                          gm={data.margins.gm}
-                          plantInput={data.inputData || null}
-                        />
-                      </BentoTile>
-                    </Grid>
+                    {/* --- ROW 3: FOUR EQUAL TILES (Bento Style) --- */}
+                    {/* --- ROW 3 & 4: BENTO TILES (2 items per row for better readability) --- */}
+                    <Grid container spacing={3}>
 
-                    <Grid size={{ xs: 12, md: 6 }}>
-                      <BentoTile title="Time Domain" icon={<AnalyticsIcon />} sx={{ height: '100%' }}>
-                        <StepResponsePlot data={data?.stepResponse} />
-                      </BentoTile>
+                      {/* 2. Compensator Details (Width: 6/12) */}
+                      <Grid size={{ xs: 12, md: 6 }}>
+                        <BentoTile title="Optimal Compensator" icon={<FunctionsIcon />} sx={{ height: '100%' }}>
+                          {data?.compensator ? (
+                            <CompensatorDetails
+                              compensator={data.compensator}
+                              pm={data.margins.pm}
+                              gm={data.margins.gm}
+                              plantInput={data.inputData || null}
+                            />
+                          ) : (
+                            <Typography color="text.disabled" align="center" sx={{ mt: 4 }}>Awaiting data...</Typography>
+                          )}
+                        </BentoTile>
+                      </Grid>
+
+                      {/* 3. Step Response (Width: 6/12) */}
+                      <Grid size={{ xs: 12, md: 6 }}>
+                        <BentoTile title="Step Response" icon={<AnalyticsIcon />} sx={{ height: '100%' }}>
+                          <StepResponsePlot data={data?.stepResponse} />
+                        </BentoTile>
+                      </Grid>
+
+                      {/* 4. Nyquist Analysis (Width: 6/12) */}
+                      <Grid size={{ xs: 12, md: 12 }}>
+                        <BentoTile title="Nyquist Analysis" icon={<TollIcon />} sx={{ height: '100%' }}>
+                          <NyquistPlot data={data?.nyquist} />
+                        </BentoTile>
+                      </Grid>
+
                     </Grid>
                   </Grid>
                 )}

@@ -35,7 +35,7 @@ const DashboardSkeleton = () => {
 
             {/* 3. Bottom Row Skeletons (Row 3 - 4+4+4) */}
             {[1, 2, 3].map((i) => (
-                <Grid size={{ xs: 12, md: 4 }} key={i}>
+                <Grid size={{ xs: 12, md: 3 }} key={i}>
                     <BentoTile sx={{ height: 300 }}>
                         <Skeleton variant="circular" width={40} height={40} sx={{ mb: 2 }} />
                         <Skeleton variant="rectangular" width="100%" height={150} sx={{ borderRadius: 2 }} />
