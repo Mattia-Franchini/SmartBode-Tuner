@@ -9,7 +9,7 @@
 
 import React from 'react';
 import { Grid, Box, Skeleton, Stack } from '@mui/material';
-import BentoTile from './BentoTile';
+import BentoTile from '../layout/BentoTile';
 
 const DashboardSkeleton = () => {
     return (

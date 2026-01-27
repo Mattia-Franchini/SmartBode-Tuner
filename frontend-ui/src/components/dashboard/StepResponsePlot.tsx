@@ -10,7 +10,7 @@ import React from 'react';
 import Plot from 'react-plotly.js';
 import {Box, CircularProgress, Typography } from '@mui/material';
 import type { Data, Layout } from 'plotly.js';
-import type { StepResponseData } from '../types/ControlSystems';
+import type { StepResponseData } from '../../types/ControlSystems';
 
 interface StepResponseProps {
     data: StepResponseData | undefined; 

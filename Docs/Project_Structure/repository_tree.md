@@ -50,19 +50,29 @@ SmartBodeTuner/
 │   │   │   └── react.svg
 │   │   │
 │   │   ├── components/
-│   │   │   ├── __test__/
-│   │   │   │   └── CompensatorDetails.test.tsx
+│   │   │   ├── dashboard/
+│   │   │   │   ├── __test__/
+│   │   │   │   │   └── CompensatorDetails.test.tsx
+│   │   │   │   │
+│   │   │   │   ├── BodePlot.tsx
+│   │   │   │   ├── CompensatorDetails.tsx
+│   │   │   │   ├── MethodologyCard.tsx
+│   │   │   │   ├── StepResponsePlot.tsx
+│   │   │   │   ├── SummaryCards.tsx
+│   │   │   │   └── SystemInputForm.tsx
 │   │   │   │
-│   │   │   ├── AuthModal.tsx
-│   │   │   ├── BodePlot.tsx
-│   │   │   ├── CompensatorDetails.tsx
-│   │   │   ├── FeedbackSnackbar.tsx
-│   │   │   ├── LockedView.tsx
-│   │   │   ├── MethodologyCard.tsx
-│   │   │   ├── Navbar.tsx
-│   │   │   ├── ProjectsModal.tsx
-│   │   │   ├── StepResponsePlot.tsx
-│   │   │   └── SystemInputForm.tsx
+│   │   │   ├── feedback/
+│   │   │   │   ├── DashboardSkeleton.tsx
+│   │   │   │   ├── FeedbackSnackbar.tsx
+│   │   │   │   └── LockedView.tsx
+│   │   │   │
+│   │   │   ├── layout/
+│   │   │   │   ├── BentoTile.tsx
+│   │   │   │   └── Navbar.tsx
+│   │   │   │
+│   │   │   └── modals/
+│   │   │       ├── AuthModal.tsx
+│   │   │       └── ProjectsModal.tsx
 │   │   │
 │   │   ├── hooks/
 │   │   │

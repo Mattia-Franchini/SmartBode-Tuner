@@ -16,19 +16,19 @@ import AnalyticsIcon from '@mui/icons-material/Analytics';
 import FunctionsIcon from '@mui/icons-material/Functions';
 
 // Imports
-import Navbar from './components/Navbar';
-import BodePlot from './components/BodePlot';
-import SystemInputForm from './components/SystemInputForm';
-import CompensatorDetails from './components/CompensatorDetails';
-import LockedView from './components/LockedView';
-import AuthModal from './components/AuthModal';
-import MethodologyCard from './components/MethodologyCard';
-import ProjectsModal from './components/ProjectsModal';
-import FeedbackSnackbar from './components/FeedbackSnackbar';
-import StepResponsePlot from './components/StepResponsePlot';
-import SummaryCards from './components/SummaryCards';
-import DashboardSkeleton from './components/DashboardSkeleton';
-import BentoTile from './components/BentoTile';
+import Navbar from './components/layout/Navbar';
+import BodePlot from './components/dashboard/BodePlot';
+import SystemInputForm from './components/dashboard/SystemInputForm';
+import CompensatorDetails from './components/dashboard/CompensatorDetails';
+import LockedView from './components/feedback/LockedView';
+import AuthModal from './components/modals/AuthModal';
+import MethodologyCard from './components/dashboard/MethodologyCard';
+import ProjectsModal from './components/modals/ProjectsModal';
+import FeedbackSnackbar from './components/feedback/FeedbackSnackbar';
+import StepResponsePlot from './components/dashboard/StepResponsePlot';
+import SummaryCards from './components/dashboard/SummaryCards';
+import DashboardSkeleton from './components/feedback/DashboardSkeleton';
+import BentoTile from './components/layout/BentoTile';
 
 import { performOptimization, getUserProjects, deleteProject, updateProjectName } from './services/apiService';
 import type { OptimizationResponse, SystemInput, User } from './types/ControlSystems';

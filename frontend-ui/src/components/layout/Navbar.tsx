@@ -22,8 +22,8 @@ import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import PersonIcon from '@mui/icons-material/Person';
 import SettingsIcon from '@mui/icons-material/Settings';
 
-import type { User } from '../types/ControlSystems';
-import { getGreeting } from '../utils/timeUtils';
+import type { User } from '../../types/ControlSystems';
+import { getGreeting } from '../../utils/timeUtils';
 
 interface NavbarProps {
     mode: 'light' | 'dark';

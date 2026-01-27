@@ -14,7 +14,7 @@ import React, { useState } from 'react';
 import Plot from 'react-plotly.js';
 import { Paper, Typography, Box, CircularProgress, Stack, FormControlLabel, Switch } from '@mui/material';
 import type { Data, Layout } from 'plotly.js';
-import type { BodePlotData } from '../types/ControlSystems';
+import type { BodePlotData } from '../../types/ControlSystems';
 
 interface BodePlotProps {
   /** The optimized system data */

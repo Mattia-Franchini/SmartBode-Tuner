@@ -13,10 +13,10 @@ import DownloadIcon from '@mui/icons-material/Download';
 import PictureAsPdfIcon from '@mui/icons-material/PictureAsPdf';
 import RestartAltIcon from '@mui/icons-material/RestartAlt';
 import TuneIcon from '@mui/icons-material/Tune';
-import type { Compensator } from '../types/ControlSystems';
+import type { Compensator } from '../../types/ControlSystems';
 import TerminalIcon from '@mui/icons-material/Terminal';
-import { downloadMatlabFile } from '../utils/matlabExport';
-import type { SystemInput } from '../types/ControlSystems';
+import { downloadMatlabFile } from '../../utils/matlabExport';
+import type { SystemInput } from '../../types/ControlSystems';
 
 interface CompensatorDetailsProps {
     /** Optimal compensator parameters returned by the AI engine */

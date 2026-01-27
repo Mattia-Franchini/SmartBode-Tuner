@@ -14,8 +14,8 @@ import {
 import CloseIcon from '@mui/icons-material/Close';
 import Visibility from '@mui/icons-material/Visibility';
 import VisibilityOff from '@mui/icons-material/VisibilityOff';
-import { loginUser, registerUser } from '../services/authService';
-import type { User } from '../types/ControlSystems';
+import { loginUser, registerUser } from '../../services/authService';
+import type { User } from '../../types/ControlSystems';
 import type { AlertColor } from '@mui/material';
 
 interface AuthModalProps {

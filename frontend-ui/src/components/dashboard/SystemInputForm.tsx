@@ -10,8 +10,8 @@ import React, { useState } from 'react';
 import { Paper, TextField, Button, Typography, Box, Divider, Stack, Tooltip, InputAdornment } from '@mui/material';
 import TuneIcon from '@mui/icons-material/Tune';
 import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
-import type { SystemInput } from '../types/ControlSystems';
-import { parseCSVToNumbers } from '../utils/mathUtils';
+import type { SystemInput } from '../../types/ControlSystems';
+import { parseCSVToNumbers } from '../../utils/mathUtils';
 
 interface SystemInputFormProps {
     onSubmit: (data: SystemInput) => void;
