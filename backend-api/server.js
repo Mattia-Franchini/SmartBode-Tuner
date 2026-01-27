@@ -5,7 +5,7 @@
  * and the Python AI Computational Engine.
  * 
  * @authors Mattia Franchini & Michele Bisignano
- * @version 1.1.0
+ * @version 1.2.0
  */
 
 const express = require('express');
@@ -118,16 +118,16 @@ app.post('/api/projects', async (req, res) => {
 
         // Specific handling if the Python Microservice is offline
         if (error.code === 'ECONNREFUSED') {
-            return res.status(503).json({ 
-                success: false, 
-                message: "AI Engine (Python) is offline. Please start the FastAPI server." 
+            return res.status(503).json({
+                success: false,
+                message: "AI Engine (Python) is offline. Please start the FastAPI server."
             });
         }
 
-        res.status(500).json({ 
-            success: false, 
-            message: "Optimization failed during processing.", 
-            error: error.message 
+        res.status(500).json({
+            success: false,
+            message: "Optimization failed during processing.",
+            error: error.message
         });
     }
 });
@@ -152,6 +152,31 @@ app.delete('/api/projects/:id', async (req, res) => {
     }
 });
 
+/**
+ * @route PUT /api/projects/:id
+ * @description Updates the name of an existing project.
+ */
+app.put('/api/projects/:id', async (req, res) => {
+    try {
+        const { projectName } = req.body;
+        const updatedProject = await Project.findByIdAndUpdate(
+            req.params.id, 
+            { projectName }, 
+            { new: true } 
+        );
+
+        if (!updatedProject) {
+            return res.status(404).json({ success: false, message: "Project not found" });
+        }
+
+        console.log(`[Database] Renamed project ${req.params.id} to "${projectName}"`);
+        res.json({ success: true, project: updatedProject });
+    } catch (error) {
+        console.error("Update Error:", error);
+        res.status(500).json({ message: "Error updating project", error });
+    }
+});
+
 // --- AUTHENTICATION ROUTES ---
 
 /**
@@ -161,7 +186,7 @@ app.delete('/api/projects/:id', async (req, res) => {
 app.post('/api/auth/register', async (req, res) => {
     try {
         const { fullName, email, password } = req.body;
-        console.log("Tentativo di registrazione per:", email); // LOG DI DEBUG
+        console.log("Tentativo di registrazione per:", email); 
 
         const existingUser = await User.findOne({ email });
         if (existingUser) return res.status(400).json({ message: "Email already registered" });
@@ -175,7 +200,6 @@ app.post('/api/auth/register', async (req, res) => {
         console.log("✅ Utente salvato con successo!");
         res.status(201).json({ success: true });
     } catch (error) {
-        // QUESTO LOG VI DICE ESATTAMENTE COSA NON VA
         console.error("❌ ERRORE CRITICO REGISTRAZIONE:", error);
         res.status(500).json({ message: "Registration error", details: error.message });
     }

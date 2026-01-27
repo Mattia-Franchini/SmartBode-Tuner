@@ -22,7 +22,7 @@ import ProjectsModal from './components/ProjectsModal';
 import FeedbackSnackbar from './components/FeedbackSnackbar';
 import StepResponsePlot from './components/StepResponsePlot';
 
-import { performOptimization, getUserProjects, deleteProject } from './services/apiService';
+import { performOptimization, getUserProjects, deleteProject, updateProjectName } from './services/apiService';
 import type { OptimizationResponse, SystemInput, User } from './types/ControlSystems';
 
 function App() {
@@ -124,6 +124,17 @@ function App() {
     });
   };
 
+  const handleRenameProject = async (projectId: string, newName: string) => {
+    if (!currentUser) return;
+    try {
+      await updateProjectName(projectId, newName);
+      loadHistory(currentUser.id); 
+      showNotify("Project renamed successfully", "info");
+    } catch (err) {
+      showNotify("Failed to rename project", "error");
+    }
+  };
+
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />
@@ -217,6 +228,7 @@ function App() {
           projects={history}
           onSelectProject={handleSelectProject}
           onDeleteProject={handleDeleteProject}
+          onRenameProject={handleRenameProject}
         />
 
       </Box>

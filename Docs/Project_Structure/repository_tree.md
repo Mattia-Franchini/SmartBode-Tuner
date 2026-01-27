@@ -1,5 +1,5 @@
 ```
-SmartBode-Tuner/
+SmartBodeTuner/
 ├── .gitignore
 ├── ai-engine/
 │   ├── core_logic.py
@@ -63,6 +63,8 @@ SmartBode-Tuner/
 │   │   │   ├── ProjectsModal.tsx
 │   │   │   ├── StepResponsePlot.tsx
 │   │   │   └── SystemInputForm.tsx
+│   │   │
+│   │   ├── hooks/
 │   │   │
 │   │   ├── index.css
 │   │   ├── main.tsx

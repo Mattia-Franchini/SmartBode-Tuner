@@ -1,19 +1,20 @@
 /**
  * @file ProjectsModal.tsx
- * @description Dialog to manage and load saved user projects.
+ * @description Dialog to manage, load, delete, and RENAME saved projects.
  * 
  * @authors Mattia Franchini & Michele Bisignano
- * @version 1.0.0
+ * @version 1.1.0
  */
 
 import React from 'react';
 import { 
     Dialog, DialogTitle, DialogContent, List, ListItem, ListItemButton, 
-    ListItemText, IconButton, Typography, Box, Chip, Tooltip, Divider 
+    ListItemText, IconButton, Typography, Box, Chip, Tooltip, Divider, Stack 
 } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
 import FolderOpenIcon from '@mui/icons-material/FolderOpen';
 import CloseIcon from '@mui/icons-material/Close';
+import EditIcon from '@mui/icons-material/Edit';
 
 interface ProjectsModalProps {
     open: boolean;
@@ -21,15 +22,24 @@ interface ProjectsModalProps {
     projects: any[];
     onSelectProject: (project: any) => void;
     onDeleteProject: (id: string) => void;
+    onRenameProject: (id: string, newName: string) => void; 
 }
 
 const ProjectsModal: React.FC<ProjectsModalProps> = ({ 
-    open, onClose, projects, onSelectProject, onDeleteProject 
+    open, onClose, projects, onSelectProject, onDeleteProject, onRenameProject 
 }) => {
     
     const handleSelect = (proj: any) => {
         onSelectProject(proj);
-        onClose(); // Chiude la modale dopo la selezione
+        onClose();
+    };
+
+    const handleRenameClick = (e: React.MouseEvent, proj: any) => {
+        e.stopPropagation(); // Prevents opening the project
+        const newName = window.prompt("Enter new project name:", proj.projectName);
+        if (newName && newName.trim() !== "") {
+            onRenameProject(proj._id, newName.trim());
+        }
     };
 
     return (
@@ -63,24 +73,32 @@ const ProjectsModal: React.FC<ProjectsModalProps> = ({
                         {projects.map((proj) => (
                             <ListItem
                                 key={proj._id}
-                                secondaryAction={
-                                    <Tooltip title="Delete Permanently">
-                                        <IconButton edge="end" color="error" onClick={() => onDeleteProject(proj._id)}>
-                                            <DeleteIcon />
-                                        </IconButton>
-                                    </Tooltip>
-                                }
                                 disablePadding
+                                secondaryAction={
+                                    <Stack direction="row" spacing={0}>
+                                        {/* RENAME BUTTON */}
+                                        <Tooltip title="Rename">
+                                            <IconButton onClick={(e) => handleRenameClick(e, proj)} color="primary">
+                                                <EditIcon />
+                                            </IconButton>
+                                        </Tooltip>
+                                        
+                                        {/* DELETE BUTTON */}
+                                        <Tooltip title="Delete Permanently">
+                                            <IconButton onClick={(e) => { e.stopPropagation(); onDeleteProject(proj._id); }} color="error">
+                                                <DeleteIcon />
+                                            </IconButton>
+                                        </Tooltip>
+                                    </Stack>
+                                }
                             >
-                                <ListItemButton onClick={() => handleSelect(proj)} sx={{ py: 2, px: 3 }}>
+                                <ListItemButton onClick={() => handleSelect(proj)} sx={{ py: 2, px: 3, pr: 12 }}>
                                     <ListItemText
-                                        primary={
-                                            <Typography fontWeight="bold">{proj.projectName}</Typography>
-                                        }
+                                        primary={<Typography fontWeight="bold">{proj.projectName}</Typography>}
                                         secondary={
                                             <React.Fragment>
                                                 <Typography variant="caption" color="text.secondary" display="block">
-                                                    {new Date(proj.createdAt).toLocaleDateString()} at {new Date(proj.createdAt).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}
+                                                    {new Date(proj.createdAt).toLocaleDateString()}
                                                 </Typography>
                                                 <Chip 
                                                     label={proj.results?.type || 'N/A'} 

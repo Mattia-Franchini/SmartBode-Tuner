@@ -48,3 +48,15 @@ export const deleteProject = async (projectId: string) => {
     const response = await axios.delete(`${API_URL}/projects/${projectId}`);
     return response.data;
 };
+
+/**
+ * Updates a project's name in the database.
+ * @param projectId Unique ID of the project
+ * @param newName The new name string
+ */
+export const updateProjectName = async (projectId: string, newName: string) => {
+    const response = await axios.put(`${API_URL}/projects/${projectId}`, {
+        projectName: newName
+    });
+    return response.data;
+};
