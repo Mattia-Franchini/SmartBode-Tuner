@@ -21,6 +21,7 @@ import MethodologyCard from './components/MethodologyCard';
 import ProjectsModal from './components/ProjectsModal';
 import FeedbackSnackbar from './components/FeedbackSnackbar';
 import StepResponsePlot from './components/StepResponsePlot';
+import SummaryCards from './components/SummaryCards';
 
 import { performOptimization, getUserProjects, deleteProject, updateProjectName } from './services/apiService';
 import type { OptimizationResponse, SystemInput, User } from './types/ControlSystems';
@@ -128,7 +129,7 @@ function App() {
     if (!currentUser) return;
     try {
       await updateProjectName(projectId, newName);
-      loadHistory(currentUser.id); 
+      loadHistory(currentUser.id);
       showNotify("Project renamed successfully", "info");
     } catch (err) {
       showNotify("Failed to rename project", "error");
@@ -176,6 +177,15 @@ function App() {
 
               <Grid size={{ xs: 12, md: 8 }}>
                 <Grid container spacing={3}>
+                  {data && data.compensator && !loading && (
+                    <Grid size={{ xs: 12 }}>
+                      <SummaryCards
+                        pm={data.margins?.pm || 0}
+                        gain={data.compensator.K}
+                        type={data.compensator.type}
+                      />
+                    </Grid>
+                  )}
                   <Grid size={{ xs: 12 }}>
                     <BodePlot
                       data={data?.bode?.compensated ?? null}
