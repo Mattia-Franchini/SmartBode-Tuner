@@ -28,6 +28,8 @@ class BodeOptimizer:
         self.den = denominator
         self.target_pm = target_pm
 
+        self.G = ct.TransferFunction(self.num, self.den)
+
         # Placeholders for the result
         self.C = None       # Controller Transfer Function
         self.L = None       # Open Loop Transfer Function L(s) = C(s)*G(s)
