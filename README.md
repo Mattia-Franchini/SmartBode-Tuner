@@ -1,3 +1,7 @@
+![Build Status](https://img.shields.io/badge/Status-In_Development-orange)
+![Tech Stack](https://img.shields.io/badge/Stack-React_|_Node_|_Python-blue)
+![Testing](https://img.shields.io/badge/Tests-Cypress_|_Vitest-green)
+
 # SmartBode Tuner 🎛️
 
 **Automated Synthesis of LTI Control Systems using Evolutionary Algorithms.**
