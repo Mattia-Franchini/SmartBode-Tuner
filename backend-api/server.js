@@ -19,10 +19,12 @@ const app = express();
 const Project = require('./models/Project');
 const User = require('./models/User');
 
+
 // --- DATABASE CONNECTION ---
 // Connects to the local MongoDB instance. 
 // Database name: smartbode
 const MONGO_URI = process.env.MONGODB_URI || 'mongodb://127.0.0.1:27017/smartbode';
+const PORT_AI = process.env.PORT_AI || 8000;
 
 mongoose.connect(MONGO_URI)
     .then(() => console.log('✅ Connected to MongoDB (Local)'))
@@ -76,8 +78,8 @@ app.post('/api/projects', async (req, res) => {
         console.log("[Node.js] 🔄 Calling Python AI Engine...");
 
         // 1. BRIDGE CALL TO PYTHON AI ENGINE (Microservice)
-        // Forward the input data to the FastAPI service running on port 8000.
-        const pythonResponse = await axios.post('http://127.0.0.1:8000/optimize', {
+        // Forward the input data to the FastAPI service running on port PORT_AI.
+        const pythonResponse = await axios.post(`http://127.0.0.1:${PORT_AI}/optimize`, {
             numerator: inputData.numerator,
             denominator: inputData.denominator,
             targetPhaseMargin: inputData.targetPhaseMargin
