@@ -30,7 +30,7 @@ async def optimize_endpoint(request: OptimizationRequest):
         target_pm=request.targetPhaseMargin
     )
     
-    time.sleep(1.0) # Simulate computation
+    #time.sleep(1.0) # Simulate computation
     
     result = engine.optimize()
     bode_data = engine.get_bode_data()
@@ -58,6 +58,6 @@ async def optimize_endpoint(request: OptimizationRequest):
         "stepResponse": step_data, # Do not modify
         "meta": {
             "executionTime": int((time.time() - start_time) * 1000),
-            "engine": "v0.9.8-placeholder"
+            "engine": "v1.0.0-ai-core"
         }
     }

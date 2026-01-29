@@ -50,29 +50,38 @@ class BodeOptimizer:
         if K <= 0 or z <= 0 or p <= 0:
             return 1e6 # High penalty for invalid parameters
 
-        # Construct Controller C(s)
-        C_candidate = ct.TransferFunction([K, K*z], [1, p])
+
+        try:
+            # Construct Controller C(s)
+            C_candidate = ct.TransferFunction([K, K*z], [1, p])
         
-        # Open Loop L(s)
-        L_candidate = C_candidate * self.G
+            # Open Loop L(s)
+            L_candidate = C_candidate * self.G
         
-        # Calculate Margins
-        # gm (Gain Margin), pm (Phase Margin), wg (Phase Crossover), wp (Gain Crossover)
-        gm, pm, wg, wp = ct.margin(L_candidate)
+            # Calculate Margins
+            # gm (Gain Margin), pm (Phase Margin), wg (Phase Crossover), wp (Gain Crossover)
+            gm, pm, wg, wp = ct.margin(L_candidate)
         
-        # Heuristic Cost Calculation:
+            # Heuristic Cost Calculation:
+
+            if(np.isnan(pm) or np.isinf(pm)):
+                return 1e6 # Penalty for undefined margins
         
-        # Case A: We are BELOW the target (Unacceptable)
-        if pm < self.target_pm:
-            # We return a high positive number (Penalty). 
-            # The further away we are, the higher the penalty.
-            return 1000 + (self.target_pm - pm) ** 2
+            # Case A: We are BELOW the target (Unacceptable)
+            if pm < self.target_pm:
+                # We return a high positive number (Penalty). 
+                # The further away we are, the higher the penalty.
+                return 1000 + (self.target_pm - pm) ** 2
         
-        # Case B: We are ABOVE the target (Acceptable)
-        else:
-            # We want to Maximize PM. Since the algorithm *minimizes* the return value,
-            # returning a negative number forces the AI to push this value lower.
-            return -pm
+            # Case B: We are ABOVE the target (Acceptable)
+            else:
+                # We want to Maximize PM. Since the algorithm *minimizes* the return value,
+                # returning a negative number forces the AI to push this value lower.
+                return -pm
+            
+        except Exception as e:
+            return 1e6 # High penalty for any computational error
+
 
     def optimize(self):
         """
