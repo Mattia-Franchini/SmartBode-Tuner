@@ -61,10 +61,18 @@ class BodeOptimizer:
         gm, pm, wg, wp = ct.margin(L_candidate)
         
         # Heuristic Cost Calculation:
-        # Squared error on Phase Margin
-        err_pm = (self.target_pm - pm) ** 2
-
-        return err_pm
+        
+        # Case A: We are BELOW the target (Unacceptable)
+        if pm < self.target_pm:
+            # We return a high positive number (Penalty). 
+            # The further away we are, the higher the penalty.
+            return 1000 + (self.target_pm - pm) ** 2
+        
+        # Case B: We are ABOVE the target (Acceptable)
+        else:
+            # We want to Maximize PM. Since the algorithm *minimizes* the return value,
+            # returning a negative number forces the AI to push this value lower.
+            return -pm
 
     def optimize(self):
         """
