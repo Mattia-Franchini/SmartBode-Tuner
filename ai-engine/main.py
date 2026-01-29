@@ -58,6 +58,6 @@ async def optimize_endpoint(request: OptimizationRequest):
         "stepResponse": step_data, # Do not modify
         "meta": {
             "executionTime": int((time.time() - start_time) * 1000),
-            "engine": "v1.0.0-ai-core"
+            "engine": "v0.9.8-placeholder"
         }
     }
