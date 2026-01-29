@@ -1,0 +1,24 @@
+{
+  "name": "smartbodetuner",
+  "version": "1.0.0",
+  "description": "![Build Status](https://img.shields.io/badge/Status-In_Development-orange) ![Tech Stack](https://img.shields.io/badge/Stack-React_|_Node_|_Python-blue) ![Testing](https://img.shields.io/badge/Tests-Cypress_|_Vitest-green)",
+  "main": "index.js",
+  "scripts": {
+    "start": "concurrently \"cd ai-engine && source venv/bin/activate && uvicorn main:app\" \"cd backend-api && npm run server\" \"cd frontend-ui && npm run dev\""
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Mattia-Franchini/SmartBode-Tuner.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/Mattia-Franchini/SmartBode-Tuner/issues"
+  },
+  "homepage": "https://github.com/Mattia-Franchini/SmartBode-Tuner#readme",
+  "devDependencies": {
+    "concurrently": "^9.2.1"
+  }
+}
