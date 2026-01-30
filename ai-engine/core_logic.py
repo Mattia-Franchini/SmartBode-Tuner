@@ -76,14 +76,14 @@ class BodeOptimizer:
                 if e_ss > self.max_error:
                     cost += PENALTY_WEIGHT * ((e_ss - self.max_error) / self.max_error) ** 2
 
-                else
+                else:
                     cost -= (self.max_error - e_ss) * 50.0 
 
             # 2. Minimum Bandwidth Constraint
             if self.min_bandwidth is not None:
                 if wp < self.min_bandwidth:
                     cost += PENALTY_WEIGHT * ((self.min_bandwidth - wp) / self.min_bandwidth) ** 2
-                else
+                else:
                     cost -= (pm - self.target_pm) * 1.0
 
             # 3. Phase Margin Objective
