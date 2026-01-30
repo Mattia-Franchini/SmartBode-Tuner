@@ -50,8 +50,7 @@ class BodeOptimizer:
         
         # Constraints: We generally want minimum phase controllers for stability
         if K <= 0 or z <= 0 or p <= 0:
-            return 1e6 # High penalty for invalid parameters
-
+            return 1e9 # High penalty for invalid parameters
 
         try:
             # Construct Controller C(s)
@@ -65,24 +64,39 @@ class BodeOptimizer:
             gm, pm, wg, wp = ct.margin(L_candidate)
         
             # Heuristic Cost Calculation:
+            cost = 0.0
+            penalty_weight = 1000.0
 
-            if(np.isnan(pm) or np.isinf(pm)):
-                return 1e6 # Penalty for undefined margins
-        
-            # Case A: We are BELOW the target (Unacceptable)
+
+            if self.max_error is not None:
+                k_loop = np.abs(ct.dcgain(L_candidate))
+                # If infinite gain (Type 1+), steady-state error is 0
+                e_ss = 0.0 if np.isinf(k_loop) else 1.0 / (1.0 + k_loop)
+                
+                if e_ss > self.max_error:
+                    cost += PENALTY_WEIGHT * ((e_ss - self.max_error) / self.max_error) ** 2
+
+                else
+                    cost -= (self.max_error - e_ss) * 50.0 
+
+            # 2. Minimum Bandwidth Constraint
+            if self.min_bandwidth is not None:
+                if wp < self.min_bandwidth:
+                    cost += PENALTY_WEIGHT * ((self.min_bandwidth - wp) / self.min_bandwidth) ** 2
+                else
+                    cost -= (pm - self.target_pm) * 1.0
+
+            # 3. Phase Margin Objective
             if pm < self.target_pm:
-                # We return a high positive number (Penalty). 
-                # The further away we are, the higher the penalty.
-                return 1000 + (self.target_pm - pm) ** 2
-        
-            # Case B: We are ABOVE the target (Acceptable)
+                cost += PENALTY_WEIGHT * (self.target_pm - pm) ** 2
             else:
-                # We want to Maximize PM. Since the algorithm *minimizes* the return value,
-                # returning a negative number forces the AI to push this value lower.
-                return -pm
-            
+                # Slight reward for exceeding target to ensure robustness
+                cost -= (pm - self.target_pm) * 0.1
+
+            return cost
+        
         except Exception as e:
-            return 1e6 # High penalty for any computational error
+            return 1e9 # High penalty for any computational error
 
 
     def optimize(self):
