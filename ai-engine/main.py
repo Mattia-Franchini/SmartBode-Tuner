@@ -8,26 +8,36 @@ Version: 0.9.7 (Placeholder)
 """
 
 from fastapi import FastAPI
-from pydantic import BaseModel
-from typing import List
+from pydantic import BaseModel, Field
+from typing import List, Optional
 import time
 from core_logic import BodeOptimizer
 
 app = FastAPI(title="SmartBode AI Engine (Bento Mode)")
 
 class OptimizationRequest(BaseModel):
-    numerator: List[float]
-    denominator: List[float]
-    targetPhaseMargin: float
+    """
+    Data contract for the optimization request.
+    Includes plant coefficients and performance constraints.
+    """
+    numerator: List[float] = Field(..., description="Numerator coefficients of G(s)")
+    denominator: List[float] = Field(..., description="Denominator coefficients of G(s)")
+    targetPhaseMargin: float = Field(..., description="Desired phase margin in degrees")
+    minBandwidth: Optional[float] = Field(None, description="Minimum crossover frequency in rad/s")
+    maxSteadyStateError: Optional[float] = Field(None, description="Maximum allowable steady-state error")
 
 @app.post("/optimize")
 async def optimize_endpoint(request: OptimizationRequest):
     start_time = time.time()
+
+    print(request)
     
     engine = BodeOptimizer(
         numerator=request.numerator, 
         denominator=request.denominator, 
-        target_pm=request.targetPhaseMargin
+        target_pm=request.targetPhaseMargin,
+        min_bandwidth=request.minBandwidth,
+        max_error=request.maxSteadyStateError
     )
     
     #time.sleep(1.0) # Simulate computation

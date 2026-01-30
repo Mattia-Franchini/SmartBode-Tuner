@@ -7,7 +7,7 @@
  */
 
 import React, { useState } from 'react';
-import { Paper, TextField, Button, Typography, Box, Divider, Stack, Tooltip, InputAdornment } from '@mui/material';
+import { Paper, TextField, Button, Typography, Box, Divider, Stack, Tooltip, InputAdornment, Grid } from '@mui/material';
 import TuneIcon from '@mui/icons-material/Tune';
 import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
 import type { SystemInput } from '../../types/ControlSystems';
@@ -22,17 +22,21 @@ const SystemInputForm: React.FC<SystemInputFormProps> = ({ onSubmit, isLoading }
     const [numStr, setNumStr] = useState<string>("10");
     const [denStr, setDenStr] = useState<string>("1, 2, 10");
     const [pmStr, setPmStr] = useState<string>("50");
+    const [bwStr, setBwStr] = useState<string>("");
+    const [essStr, setEssStr] = useState<string>("");
 
     const isValidCSV = (str: string) => /^[0-9,.\s-]+$/.test(str);
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
         if (!isValidCSV(numStr) || !isValidCSV(denStr)) return;
-        
+
         onSubmit({
             numerator: parseCSVToNumbers(numStr),
             denominator: parseCSVToNumbers(denStr),
-            targetPhaseMargin: parseFloat(pmStr) || 45
+            targetPhaseMargin: parseFloat(pmStr) || 45,
+            minBandwidth: bwStr ? parseFloat(bwStr) : undefined,
+            maxSteadyStateError: essStr ? parseFloat(essStr) : undefined
         });
     };
 
@@ -40,7 +44,7 @@ const SystemInputForm: React.FC<SystemInputFormProps> = ({ onSubmit, isLoading }
         <Paper elevation={3} sx={{ p: 4, borderRadius: 4 }}>
             <Box component="form" onSubmit={handleSubmit}>
                 <Typography variant="h6" fontWeight="800" gutterBottom>System Config</Typography>
-                
+
                 <Stack spacing={3} sx={{ mt: 2 }}>
                     <TextField
                         label="Numerator G(s)"
@@ -71,15 +75,52 @@ const SystemInputForm: React.FC<SystemInputFormProps> = ({ onSubmit, isLoading }
                         fullWidth
                     />
 
-                    <Divider />
+                    <Divider sx={{ my: 1 }}>
+                        <Typography variant="caption" color="text.disabled">PERFORMANCE REQUIREMENTS</Typography>
+                    </Divider>
 
-                    <TextField
-                        label="Target Phase Margin (°)"
-                        type="number"
-                        value={pmStr}
-                        onChange={(e) => setPmStr(e.target.value)}
-                        fullWidth
-                    />
+                    <Grid container spacing={2}>
+                        {/* Target PM */}
+                        <Grid size={{ xs: 12 }}>
+                            <TextField
+                                label="Target Phase Margin (°)"
+                                type="number"
+                                value={pmStr}
+                                onChange={(e) => setPmStr(e.target.value)}
+                                fullWidth
+                                disabled={isLoading}
+                            />
+                        </Grid>
+
+                        {/* Bandwidth */}
+                        <Grid size={{ xs: 6 }}>
+                            <TextField
+                                label="Min Bandwidth (rad/s)"
+                                type="number"
+                                value={bwStr}
+                                onChange={(e) => setBwStr(e.target.value)}
+                                fullWidth
+                                disabled={isLoading}
+                                placeholder="Optional"
+                                InputLabelProps={{ shrink: true }}
+                            />
+                        </Grid>
+
+                        {/* Steady State Error */}
+                        <Grid size={{ xs: 6 }}>
+                            <TextField
+                                label="Max SS Error"
+                                type="number"
+                                value={essStr}
+                                onChange={(e) => setEssStr(e.target.value)}
+                                fullWidth
+                                disabled={isLoading}
+                                placeholder="e.g. 0.05"
+                                InputLabelProps={{ shrink: true }}
+                            />
+                        </Grid>
+                    </Grid>
+
 
                     <Button
                         type="submit"

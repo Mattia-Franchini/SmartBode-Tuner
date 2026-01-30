@@ -15,7 +15,7 @@ from scipy.optimize import differential_evolution
 class BodeOptimizer:
 
 
-    def __init__(self, numerator, denominator, target_pm):
+    def __init__(self, numerator, denominator, target_pm, min_bandwidth, max_error):
         """
         Initializes the optimizer with the Plant (Process) transfer function.
     
@@ -27,6 +27,8 @@ class BodeOptimizer:
         self.num = numerator
         self.den = denominator
         self.target_pm = target_pm
+        self.min_bandwidth = min_bandwidth
+        self.max_error = max_error
 
         self.G = ct.TransferFunction(self.num, self.den)
 

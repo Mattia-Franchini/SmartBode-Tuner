@@ -24,6 +24,12 @@ export interface SystemInput {
 
     /** The desired Phase Margin in degrees (e.g., 50.0). */
     targetPhaseMargin: number;
+
+    /** Min crossover frequency (rad/s)*/
+    minBandwidth?: number;
+
+    /** Max allowed error (e.g., 0.1 for 10%) */
+    maxSteadyStateError?: number;
 }
 
 export interface StepResponseData {

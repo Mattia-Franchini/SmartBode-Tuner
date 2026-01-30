@@ -82,7 +82,9 @@ app.post('/api/projects', async (req, res) => {
         const pythonResponse = await axios.post(`http://127.0.0.1:${PORT_AI}/optimize`, {
             numerator: inputData.numerator,
             denominator: inputData.denominator,
-            targetPhaseMargin: inputData.targetPhaseMargin
+            targetPhaseMargin: inputData.targetPhaseMargin,
+            minBandwidth: inputData.minBandwidth,       
+            maxSteadyStateError: inputData.maxSteadyStateError
         });
 
         // Extract the actual calculated results from the Python response
