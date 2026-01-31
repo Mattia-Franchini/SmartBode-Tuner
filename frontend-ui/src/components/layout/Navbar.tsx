@@ -136,7 +136,7 @@ const Navbar: React.FC<NavbarProps> = ({ mode, onToggleTheme, isLoggedIn, onLogo
                                     </MenuItem>
 
                                     {/* 2. PROJECTS */}
-                                    <MenuItem onClick={handleOpenProjects}>
+                                    <MenuItem onClick={() => handlePlaceholderAction("Projects")}>
                                         <ListItemIcon>
                                             <FolderSharedIcon fontSize="small" />
                                         </ListItemIcon>

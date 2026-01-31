@@ -27,9 +27,20 @@ const SystemInputForm: React.FC<SystemInputFormProps> = ({ onSubmit, isLoading }
 
     const isValidCSV = (str: string) => /^[0-9,.\s-]+$/.test(str);
 
+    const isFormInvalid = () => {
+        return (
+            !isValidCSV(numStr) || 
+            !isValidCSV(denStr) || 
+            pmStr.trim() === "" || 
+            bwStr.trim() === "" || 
+            essStr.trim() === ""
+        );
+    };
+
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        if (!isValidCSV(numStr) || !isValidCSV(denStr)) return;
+
+        if (isFormInvalid()) return;
 
         onSubmit({
             numerator: parseCSVToNumbers(numStr),
@@ -47,6 +58,7 @@ const SystemInputForm: React.FC<SystemInputFormProps> = ({ onSubmit, isLoading }
 
                 <Stack spacing={3} sx={{ mt: 2 }}>
                     <TextField
+                        required
                         label="Numerator G(s)"
                         error={!isValidCSV(numStr)}
                         helperText={!isValidCSV(numStr) ? "Invalid format (use 1, 2, 3)" : "Descending powers of s"}
@@ -66,6 +78,7 @@ const SystemInputForm: React.FC<SystemInputFormProps> = ({ onSubmit, isLoading }
                     />
 
                     <TextField
+                        required
                         label="Denominator G(s)"
                         error={!isValidCSV(denStr)}
                         helperText={!isValidCSV(denStr) ? "Invalid format" : "Example: '1, 2, 1' for s^2 + 2s + 1"}
@@ -83,6 +96,7 @@ const SystemInputForm: React.FC<SystemInputFormProps> = ({ onSubmit, isLoading }
                         {/* Target PM */}
                         <Grid size={{ xs: 12 }}>
                             <TextField
+                                required
                                 label="Target Phase Margin (°)"
                                 type="number"
                                 value={pmStr}
@@ -95,13 +109,14 @@ const SystemInputForm: React.FC<SystemInputFormProps> = ({ onSubmit, isLoading }
                         {/* Bandwidth */}
                         <Grid size={{ xs: 6 }}>
                             <TextField
+                                required
                                 label="Min Bandwidth (rad/s)"
                                 type="number"
                                 value={bwStr}
                                 onChange={(e) => setBwStr(e.target.value)}
                                 fullWidth
                                 disabled={isLoading}
-                                placeholder="Optional"
+                                placeholder="e.g. 10"
                                 InputLabelProps={{ shrink: true }}
                             />
                         </Grid>
@@ -109,6 +124,7 @@ const SystemInputForm: React.FC<SystemInputFormProps> = ({ onSubmit, isLoading }
                         {/* Steady State Error */}
                         <Grid size={{ xs: 6 }}>
                             <TextField
+                                required
                                 label="Max SS Error"
                                 type="number"
                                 value={essStr}
@@ -126,7 +142,7 @@ const SystemInputForm: React.FC<SystemInputFormProps> = ({ onSubmit, isLoading }
                         type="submit"
                         variant="contained"
                         fullWidth
-                        disabled={isLoading || !isValidCSV(numStr) || !isValidCSV(denStr)}
+                        disabled={isLoading || isFormInvalid()}
                         sx={{ height: 55, fontWeight: 'bold', borderRadius: 2 }}
                         startIcon={<TuneIcon />}
                     >

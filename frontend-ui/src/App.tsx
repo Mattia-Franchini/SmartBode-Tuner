@@ -17,20 +17,18 @@ import FunctionsIcon from '@mui/icons-material/Functions';
 import TollIcon from '@mui/icons-material/Toll';
 
 // Imports
-import Navbar from './components/layout/Navbar';
-import BodePlot from './components/dashboard/BodePlot';
-import SystemInputForm from './components/dashboard/SystemInputForm';
-import CompensatorDetails from './components/dashboard/CompensatorDetails';
-import LockedView from './components/feedback/LockedView';
-import AuthModal from './components/modals/AuthModal';
-import MethodologyCard from './components/dashboard/MethodologyCard';
-import ProjectsModal from './components/modals/ProjectsModal';
-import FeedbackSnackbar from './components/feedback/FeedbackSnackbar';
-import StepResponsePlot from './components/dashboard/StepResponsePlot';
-import NyquistPlot from './components/dashboard/NyquistPlot';
-import SummaryCards from './components/dashboard/SummaryCards';
-import DashboardSkeleton from './components/feedback/DashboardSkeleton';
-import BentoTile from './components/layout/BentoTile';
+import { Navbar, BentoTile } from './components/layout';
+import { 
+  BodePlot, 
+  StepResponsePlot, 
+  SummaryCards, 
+  SystemInputForm, 
+  CompensatorDetails, 
+  MethodologyCard, 
+  NyquistPlot 
+} from './components/dashboard';
+import { AuthModal, ProjectsModal } from './components/modals';
+import { DashboardSkeleton, FeedbackSnackbar, LockedView } from './components/feedback';
 
 import { performOptimization, getUserProjects, deleteProject, updateProjectName } from './services/apiService';
 import type { OptimizationResponse, SystemInput, User } from './types/ControlSystems';

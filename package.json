@@ -4,7 +4,7 @@
   "description": "![Build Status](https://img.shields.io/badge/Status-In_Development-orange) ![Tech Stack](https://img.shields.io/badge/Stack-React_|_Node_|_Python-blue) ![Testing](https://img.shields.io/badge/Tests-Cypress_|_Vitest-green)",
   "main": "index.js",
  "scripts": {
-    "start": "concurrently \"cd ai-engine && venv\\Scripts\\uvicorn main:app --reload --port 8001\" \"cd backend-api && npm start\" \"cd frontend-ui && npm run dev\""
+    "start": "concurrently \"cd ai-engine && source venv/bin/activate && uvicorn main:app\" \"cd backend-api && npm start\" \"cd frontend-ui && npm run dev\""
   },
   "repository": {
     "type": "git",
