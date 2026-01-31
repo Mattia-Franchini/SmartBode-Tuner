@@ -36,6 +36,8 @@ The project follows a modern **Microservices-based Architecture** organized in a
 
 ## 📂 Project Structure
 
+👉 [**View Full Repository Tree**](Docs/Project_Structure/repository_tree.md)
+
 ```text
 SmartBodeTuner/
 ├── ai-engine/             # Python Microservice (Optimization Logic)
