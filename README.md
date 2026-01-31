@@ -3,6 +3,7 @@
 ![Testing](https://img.shields.io/badge/Tests-Cypress_|_Vitest-green)
 
 # SmartBode Tuner 🎛️
+<img src="Docs/Assets/logo_SmartBode-Tuner.png" alt="SmartBode-Tuner Logo" width="200"/>
 
 **Automated Synthesis of LTI Control Systems using Evolutionary Algorithms.**
 
